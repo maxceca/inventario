@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CEN Systems — Herramienta SmartNet Cisco</title>
+<title>CEN Systems — SmartNet Cisco Tool</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
@@ -52,13 +52,11 @@
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Inicio SmartNet</label>
-          <input id="m-start" type="date"
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input id="m-start" type="date" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Fin SmartNet</label>
-          <input id="m-end" type="date"
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input id="m-end" type="date" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
       </div>
       <div class="grid grid-cols-2 gap-3">
@@ -69,8 +67,7 @@
         </div>
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Nombre del cliente</label>
-          <input id="m-client" type="text"
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input id="m-client" type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
       </div>
       <div>
@@ -78,17 +75,10 @@
         <input id="m-addr" type="text" placeholder="Calle, Ciudad, País, CP"
           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
       </div>
-      <p class="text-xs text-gray-400">Los campos de CEN Support, PRY y SC se toman de la configuración del proyecto.</p>
     </div>
     <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
-      <button onclick="closeModal()"
-        class="border border-gray-300 hover:bg-gray-50 px-5 py-2 rounded-lg text-sm font-medium transition-colors">
-        Cancelar
-      </button>
-      <button onclick="saveManualRow()"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">
-        Guardar y aplicar
-      </button>
+      <button onclick="closeModal()" class="border border-gray-300 hover:bg-gray-50 px-5 py-2 rounded-lg text-sm font-medium transition-colors">Cancelar</button>
+      <button onclick="saveManualRow()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">Guardar y aplicar</button>
     </div>
   </div>
 </div>
@@ -97,8 +87,8 @@
 <header class="bg-blue-700 text-white px-8 py-4 shadow-lg">
   <div class="max-w-7xl mx-auto flex items-center justify-between">
     <div>
-      <h1 class="text-xl font-bold tracking-wide">CEN Systems — Herramienta SmartNet Cisco</h1>
-      <p class="text-blue-200 text-sm mt-0.5">Procesamiento de inventario para Proactivanet · v3.0</p>
+      <h1 class="text-xl font-bold tracking-wide">CEN Systems — SmartNet Cisco Tool</h1>
+      <p class="text-blue-200 text-sm mt-0.5">Procesamiento Proactivanet · v4.0 Web</p>
     </div>
     <div id="header-counts" class="text-blue-200 text-xs text-right leading-relaxed"></div>
   </div>
@@ -108,15 +98,100 @@
 
   <!-- TAB NAV -->
   <div class="flex gap-1 border-b border-gray-200 mb-8">
-    <button class="tab-btn px-6 py-3 text-sm" data-tab="files"   onclick="goToTab('files')">① Cargar Archivos</button>
-    <button class="tab-btn px-6 py-3 text-sm" data-tab="config"  onclick="goToTab('config')">② Configurar Proyecto</button>
-    <button class="tab-btn px-6 py-3 text-sm" data-tab="results" onclick="goToTab('results')">③ Resultados</button>
+    <button class="tab-btn px-6 py-3 text-sm" data-tab="guide"   onclick="goToTab('guide')">① Descargar de Cisco</button>
+    <button class="tab-btn px-6 py-3 text-sm" data-tab="files"   onclick="goToTab('files')">② Cargar Archivos</button>
+    <button class="tab-btn px-6 py-3 text-sm" data-tab="config"  onclick="goToTab('config')">③ Configurar Proyecto</button>
+    <button class="tab-btn px-6 py-3 text-sm" data-tab="results" onclick="goToTab('results')">④ Resultados</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       TAB 0 — GUÍA DESCARGA MANUAL CCW-R
+  ══════════════════════════════════════════════ -->
+  <div id="tab-guide" class="tab-content">
+    <div class="max-w-3xl mx-auto">
+
+      <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-6">
+        <div class="flex items-start gap-4">
+          <span class="text-4xl">🌐</span>
+          <div>
+            <h2 class="text-base font-bold text-blue-900 mb-1">Descarga desde Cisco CCW-R</h2>
+            <p class="text-sm text-blue-700">Inicia sesión con tu CCO ID y descarga los archivos Excel. Luego súbelos en el paso ②.</p>
+            <a href="https://ccrc.cisco.com/ccwr/" target="_blank"
+              class="inline-block mt-3 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm">
+              Abrir Cisco CCW-R →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pasos -->
+      <div class="space-y-4">
+
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+          <div class="flex items-start gap-4">
+            <span class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
+            <div>
+              <h3 class="text-sm font-semibold text-gray-800 mb-1">Inicia sesión en CCW-R</h3>
+              <p class="text-xs text-gray-500">Usa tu CCO ID y completa el MFA. Haz clic en el botón de arriba para abrir el portal.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+          <div class="flex items-start gap-4">
+            <span class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
+            <div>
+              <h3 class="text-sm font-semibold text-gray-800 mb-2">Descarga por Número de serie (SmartNet)</h3>
+              <ol class="text-xs text-gray-500 space-y-1 list-decimal list-inside">
+                <li>Haz clic en el botón del tipo de búsqueda → selecciona <strong class="text-gray-700">PAK/Número de serie</strong></li>
+                <li>Pega los números de serie (uno por línea) y presiona Enter</li>
+                <li>Selecciona todo con el checkbox superior</li>
+                <li>Clic en <strong class="text-gray-700">Exportar</strong> → activa <em>Minor Lines, Address Details, Quoting Ineligible Reason</em></li>
+                <li>Clic en <strong class="text-gray-700">Exportar</strong> → guarda el archivo .xlsx</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+          <div class="flex items-start gap-4">
+            <span class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
+            <div>
+              <h3 class="text-sm font-semibold text-gray-800 mb-2">Descarga por Subscription ID <span class="text-gray-400 font-normal">(si aplica)</span></h3>
+              <ol class="text-xs text-gray-500 space-y-1 list-decimal list-inside">
+                <li>Clic en <strong class="text-gray-700">Nueva búsqueda</strong></li>
+                <li>Cambia el tipo a <strong class="text-gray-700">Subscription ID</strong></li>
+                <li>Pega los IDs y repite el proceso de exportar</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+          <div class="flex items-start gap-4">
+            <span class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">4</span>
+            <div>
+              <h3 class="text-sm font-semibold text-gray-800 mb-1">Continúa al paso ②</h3>
+              <p class="text-xs text-gray-500">Una vez que tengas los archivos .xlsx descargados, ve a <strong class="text-gray-700">② Cargar Archivos</strong> y súbelos.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mt-6 flex justify-end">
+        <button onclick="goToTab('files')"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors shadow-sm text-sm">
+          Ya tengo los archivos → Ir a Cargar Archivos
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- ══════════════════════════════════════════════
        TAB 1 — CARGAR ARCHIVOS
   ══════════════════════════════════════════════ -->
-  <div id="tab-files" class="tab-content">
+  <div id="tab-files" class="tab-content hidden">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div class="flex items-start justify-between mb-3">
@@ -160,12 +235,11 @@
       </div>
     </div>
 
-    <!-- Clientes descubiertos -->
     <div id="clients-panel" class="hidden bg-white rounded-xl shadow-sm border border-blue-200 p-6 mb-6">
       <div class="flex items-center justify-between mb-3">
         <div>
           <h2 class="text-base font-semibold text-gray-800">Clientes encontrados en la base de Cisco</h2>
-          <p class="text-sm text-gray-500 mt-0.5">Selecciona los nombres que corresponden a <strong>tu cliente</strong>. Puedes seleccionar varios si Cisco lo tiene registrado diferente.</p>
+          <p class="text-sm text-gray-500 mt-0.5">Selecciona los nombres que corresponden a <strong>tu cliente</strong>.</p>
         </div>
         <div class="text-right">
           <div id="selected-count" class="text-sm font-semibold text-blue-700"></div>
@@ -190,19 +264,14 @@
        TAB 2 — CONFIGURAR PROYECTO
   ══════════════════════════════════════════════ -->
   <div id="tab-config" class="tab-content hidden">
-
     <div id="config-client-summary" class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
       <p class="text-sm font-medium text-blue-800 mb-2">Nombres en Cisco que corresponden a tu cliente:</p>
       <div id="config-client-chips" class="flex flex-wrap gap-2 mb-3"></div>
       <div>
-        <label class="block text-sm font-medium text-blue-800 mb-1">
-          Nombre oficial del cliente
-          <span class="text-blue-500 font-normal ml-1">(como debe quedar en el inventario)</span>
-        </label>
+        <label class="block text-sm font-medium text-blue-800 mb-1">Nombre oficial del cliente <span class="text-blue-500 font-normal ml-1">(como debe quedar en el inventario)</span></label>
         <input type="text" id="input-client-oficial"
           placeholder="Ej: Tribunal Electoral del Poder Judicial de la Federación"
           class="w-full border border-blue-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-        <p class="text-xs text-blue-500 mt-1">Este nombre reemplaza al de Cisco en todas las filas del Excel exportado.</p>
       </div>
     </div>
 
@@ -229,19 +298,16 @@
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Inicio CEN Support</label>
-              <input type="date" id="input-inicio-cen"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <input type="date" id="input-inicio-cen" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Fin CEN Support</label>
-              <input type="date" id="input-fin-cen"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <input type="date" id="input-fin-cen" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Tipo CEN Support</label>
-            <select id="input-tipo-cen"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+            <select id="input-tipo-cen" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
               <option value="">— Seleccionar —</option>
               <option value="CEN-SUP-GLD">CEN-SUP-GLD</option>
               <option value="CEN-SUP-SLV">CEN-SUP-SLV</option>
@@ -255,31 +321,21 @@
 
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
       <h2 class="text-base font-semibold text-gray-800 mb-1">Lista de Números de Serie</h2>
-      <p class="text-sm text-gray-500 mb-3">
-        Pega los seriales que el cliente entregó (uno por línea) o sube un archivo.
-        <strong class="text-gray-700">Todos aparecerán en resultados</strong> — los faltantes quedan marcados para gestión.
-      </p>
+      <p class="text-sm text-gray-500 mb-3">Pega los seriales del cliente (uno por línea). <strong class="text-gray-700">Todos aparecerán en resultados</strong> — los faltantes quedan marcados.</p>
       <textarea id="input-serials" rows="8"
-        placeholder="FOC2147Z0DB&#10;FCH22137WBS&#10;FDO22151YHY&#10;..."
+        placeholder="FOC2147Z0DB&#10;FCH22137WBS&#10;..."
         oninput="updateSerialsCount()"
         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
       <div class="mt-2 flex flex-wrap items-center gap-3">
         <span class="text-sm text-gray-500">O sube un archivo:</span>
         <input type="file" id="file-serials" accept=".txt,.xlsx,.xls,.csv" onchange="loadSerialsFile(event)" class="text-sm text-gray-500">
-        <span class="text-xs text-gray-400">TXT · Excel (col A)</span>
         <span id="serials-count" class="text-sm font-semibold text-blue-700 ml-auto"></span>
       </div>
     </div>
 
     <div class="flex justify-between">
-      <button onclick="goToTab('files')"
-        class="border border-gray-300 hover:bg-gray-50 px-8 py-2.5 rounded-lg text-sm font-medium transition-colors">
-        ← Volver
-      </button>
-      <button onclick="processData()"
-        class="bg-green-600 hover:bg-green-700 text-white px-10 py-2.5 rounded-lg font-medium transition-colors shadow-sm">
-        Procesar y Validar →
-      </button>
+      <button onclick="goToTab('files')" class="border border-gray-300 hover:bg-gray-50 px-8 py-2.5 rounded-lg text-sm font-medium transition-colors">← Volver</button>
+      <button onclick="processData()" class="bg-green-600 hover:bg-green-700 text-white px-10 py-2.5 rounded-lg font-medium transition-colors shadow-sm">Procesar y Validar →</button>
     </div>
   </div>
 
@@ -287,49 +343,34 @@
        TAB 3 — RESULTADOS
   ══════════════════════════════════════════════ -->
   <div id="tab-results" class="tab-content hidden">
-
-    <!-- Top bar -->
     <div class="flex justify-end mb-4">
       <button id="btn-export-inv" onclick="exportExcel()" disabled
         class="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg font-semibold transition-colors text-sm shadow-sm">
         ⬇ Exportar INVENTARIO + VALIDACION
       </button>
     </div>
-
-    <!-- Alerta de cobertura -->
     <div id="coverage-alert" class="hidden rounded-xl p-4 mb-5 border text-sm"></div>
-
-    <!-- ── PANEL: Cargar archivo complementario ── -->
     <div id="complement-panel" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-5 mb-5">
       <div class="flex items-start gap-3 mb-4">
         <span class="text-2xl">📥</span>
         <div>
           <h3 class="text-sm font-semibold text-amber-900">Cargar archivo complementario de Cisco</h3>
-          <p class="text-xs text-amber-700 mt-0.5">
-            Descarga de Cisco el archivo con las series faltantes y súbelo aquí.
-            Se integrará con los datos ya cargados y se reprocesará automáticamente.
-          </p>
+          <p class="text-xs text-amber-700 mt-0.5">Descarga de Cisco el archivo con las series faltantes y súbelo aquí.</p>
         </div>
       </div>
       <div class="flex flex-wrap gap-4">
         <label class="flex-1 min-w-48 cursor-pointer bg-white border border-amber-300 hover:border-amber-500 rounded-lg p-3 text-center transition-colors">
           <p class="text-xs font-medium text-amber-800 mb-1">SmartNet adicional</p>
-          <p class="text-xs text-gray-400">ccrc.cisco.com → BD Inventario</p>
           <input type="file" accept=".xlsx,.xls" onchange="loadComplementary('smartnet',event)" class="hidden">
         </label>
         <label class="flex-1 min-w-48 cursor-pointer bg-white border border-amber-300 hover:border-amber-500 rounded-lg p-3 text-center transition-colors">
           <p class="text-xs font-medium text-amber-800 mb-1">Suscripciones adicional</p>
-          <p class="text-xs text-gray-400">ccrc.cisco.com → BD SUSCRIPCIONES</p>
           <input type="file" accept=".xlsx,.xls" onchange="loadComplementary('subs',event)" class="hidden">
         </label>
       </div>
       <div id="complement-status" class="mt-3 text-xs"></div>
     </div>
-
-    <!-- Stats -->
     <div id="results-summary" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-5"></div>
-
-    <!-- Filters + search -->
     <div class="flex flex-wrap items-center gap-3 mb-4">
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 flex-1">
         <div class="flex flex-wrap px-2" id="filter-buttons"></div>
@@ -338,8 +379,6 @@
         oninput="renderTable()"
         class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-56 focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
-
-    <!-- Table -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-5">
       <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
@@ -365,37 +404,21 @@
         </table>
       </div>
     </div>
-
     <div class="flex justify-between">
-      <button onclick="goToTab('config')"
-        class="border border-gray-300 hover:bg-gray-50 px-8 py-2.5 rounded-lg text-sm font-medium transition-colors">
-        ← Volver
-      </button>
+      <button onclick="goToTab('config')" class="border border-gray-300 hover:bg-gray-50 px-8 py-2.5 rounded-lg text-sm font-medium transition-colors">← Volver</button>
     </div>
   </div>
 
 </main>
 
-<!-- ══════════════════════════════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════════════════════════ -->
 <script>
-
 // ─── STATE ────────────────────────────────────────────────
 const S = {
-  smartNetRows:    [],
-  subsRows:        [],
-  locationMap:     new Map(),
-  allClientNames:  [],
-  selectedClients: new Set(),
-  results:         null,
-  allItems:        [],
-  activeFilter:    'all',
-  // Manual overrides
-  claimedSerials:   new Set(),   // wrong-client serials the user claims as theirs
-  discardedSerials: new Set(),   // serials the user explicitly discarded
-  manualRows:       new Map(),   // serial → manually entered row data
-  pendingManual:    null,        // serial currently being edited in modal
+  smartNetRows: [], subsRows: [], locationMap: new Map(),
+  allClientNames: [], selectedClients: new Set(),
+  results: null, allItems: [], activeFilter: 'all',
+  claimedSerials: new Set(), discardedSerials: new Set(),
+  manualRows: new Map(), pendingManual: null,
 };
 
 // ─── TABS ─────────────────────────────────────────────────
@@ -404,13 +427,11 @@ function goToTab(name) {
   document.getElementById('tab-' + name).classList.remove('hidden');
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
 }
-goToTab('files');
+goToTab('guide');
 
 // ─── UTILS ────────────────────────────────────────────────
-function esc(s) {
-  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function cleanText(s) { return String(s ?? '').replace(/^\^+/,'').trim(); }
+function esc(s) { return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function cleanText(s) { return String(s??'').replace(/^\^+/,'').trim(); }
 function buildAddress(row) {
   return [row['End Customer Address'],row['End Customer City'],
           row['End Customer State']||row['End Customer Province'],
@@ -418,11 +439,12 @@ function buildAddress(row) {
     .filter(Boolean).join(', ');
 }
 function fmtConfigDate(d) {
-  if (!d) return '';
-  const [y,m,day] = d.split('-');
-  const mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  if(!d) return '';
+  const [y,m,day]=d.split('-');
+  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   return `${day}-${mo[parseInt(m,10)-1]}-${y}`;
 }
+
 // ─── FILE PARSING ─────────────────────────────────────────
 function readWB(file, cb) {
   const r = new FileReader();
@@ -472,7 +494,6 @@ function loadCiscoFile(type, ev) {
   });
 }
 
-// Complementary file — MERGES with existing rows, deduplicates by PAK+Contract key
 function loadComplementary(type, ev) {
   const file = ev.target.files[0]; if(!file) return;
   const statusEl = document.getElementById('complement-status');
@@ -481,8 +502,6 @@ function loadComplementary(type, ev) {
     if(err){ statusEl.textContent='✗ Error al leer el archivo'; statusEl.className='text-xs text-red-600'; return; }
     const newRows = parseCiscoWB(wb);
     const existing = type==='smartnet' ? S.smartNetRows : S.subsRows;
-
-    // Build dedup key from existing rows
     const existingKeys = new Set(existing.map(r =>
       (r['PAK/Serial Number']||'')+'|'+(r['Subscription ID/Contract Number']||'')+'|'+(r['Major/Minor']||'')
     ));
@@ -490,16 +509,11 @@ function loadComplementary(type, ev) {
       const k=(r['PAK/Serial Number']||'')+'|'+(r['Subscription ID/Contract Number']||'')+'|'+(r['Major/Minor']||'');
       return !existingKeys.has(k);
     });
-
     if(type==='smartnet') S.smartNetRows = [...S.smartNetRows, ...added];
     else                  S.subsRows     = [...S.subsRows, ...added];
-
-    statusEl.textContent=`✓ ${added.length} nuevos registros integrados de ${newRows.length} en el archivo. Reprocesando...`;
+    statusEl.textContent=`✓ ${added.length} nuevos registros integrados. Reprocesando...`;
     statusEl.className='text-xs text-green-700';
-    updateHeaderCounts();
-    refreshClientList();
-
-    // Auto-reprocess
+    updateHeaderCounts(); refreshClientList();
     setTimeout(()=>{ processData(true); }, 300);
   });
 }
@@ -513,7 +527,7 @@ function loadLocationFile(ev) {
     rows.forEach((row,i)=>{
       const serial=String(row[0]||'').trim().toUpperCase();
       const loc   =String(row[1]||'').trim();
-      if(i===0 && /serial|serie|numero|n[oº]/i.test(serial)) return;
+      if(i===0 && /serial|serie|numero/i.test(serial)) return;
       if(serial && loc) S.locationMap.set(serial,loc);
     });
     document.getElementById('location-status').textContent=`✓ ${S.locationMap.size} ubicaciones`;
@@ -532,8 +546,7 @@ function loadSerialsFile(ev) {
     readWB(file,(err,wb)=>{
       if(err) return;
       const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''});
-      const serials=rows.map(r=>String(r[0]||'').trim())
-        .filter(s=>s&&!/^(serial|serie|numero|number|n[oº])/i.test(s));
+      const serials=rows.map(r=>String(r[0]||'').trim()).filter(s=>s&&!/^(serial|serie|numero|number)/i.test(s));
       document.getElementById('input-serials').value=serials.join('\n');
       updateSerialsCount();
     });
@@ -559,24 +572,21 @@ function renderClientList() {
   const search=(document.getElementById('client-search')?.value||'').toLowerCase();
   const filtered=S.allClientNames.filter(n=>!search||n.toLowerCase().includes(search));
   const container=document.getElementById('clients-list');
-  if(filtered.length===0){
-    container.innerHTML=`<p class="text-sm text-gray-400">Sin resultados</p>`;
-  } else {
-    container.innerHTML=filtered.map(name=>{
+  container.innerHTML=filtered.length===0
+    ?`<p class="text-sm text-gray-400">Sin resultados</p>`
+    :filtered.map(name=>{
       const sel=S.selectedClients.has(name);
-      return `<button class="client-chip border rounded-full px-3 py-1.5 text-sm ${sel?'selected':''}"
-        data-client="${esc(name)}">${esc(name)}</button>`;
+      return `<button class="client-chip border rounded-full px-3 py-1.5 text-sm ${sel?'selected':''}" data-client="${esc(name)}">${esc(name)}</button>`;
     }).join('');
-    container.querySelectorAll('.client-chip').forEach(btn=>{
-      btn.addEventListener('click',()=>toggleClient(btn.dataset.client));
-    });
-  }
+  container.querySelectorAll('.client-chip').forEach(btn=>{
+    btn.addEventListener('click',()=>toggleClient(btn.dataset.client));
+  });
   updateSelectedCount();
 }
 
 function toggleClient(name) {
   if(S.selectedClients.has(name)) S.selectedClients.delete(name);
-  else                            S.selectedClients.add(name);
+  else S.selectedClients.add(name);
   renderClientList(); syncConfigClientSummary();
 }
 
@@ -621,7 +631,7 @@ function getSerials() {
 function clientIsSelected(name) { return S.selectedClients.has((name||'').trim()); }
 
 function processData(silent=false) {
-  if(S.selectedClients.size===0){ if(!silent) alert('Selecciona el cliente en el paso anterior.'); return; }
+  if(S.selectedClients.size===0){ if(!silent) alert('Selecciona el cliente.'); return; }
   const serialList=getSerials();
   if(serialList.length===0){ if(!silent) alert('Ingresa al menos un número de serie.'); return; }
 
@@ -634,7 +644,6 @@ function processData(silent=false) {
     clientOficial:document.getElementById('input-client-oficial').value.trim(),
   };
 
-  // Index SmartNet
   const smByPak=new Map(), smByParent=new Map();
   for(const row of S.smartNetRows){
     const pak   =(row['PAK/Serial Number']       ||'').toUpperCase();
@@ -645,63 +654,29 @@ function processData(silent=false) {
   }
 
   const smResults=[];
-
   for(const serial of serialList){
-    // Check if discarded by user
-    if(S.discardedSerials.has(serial)){
-      smResults.push({ serial, status:'discarded', source:'discarded' });
-      continue;
-    }
-
-    // Check if manually overridden
-    if(S.manualRows.has(serial)){
-      const m=S.manualRows.get(serial);
-      smResults.push({ serial, status:'ok', source:'manual', row: m, minors:[], alsoIn:[] });
-      continue;
-    }
-
-    // Any row with this PAK/Serial Number qualifies — Major/Minor only affects
-    // whether the row is a standalone chassis or a module, but if the user
-    // provides a serial it must be kept regardless of that flag.
+    if(S.discardedSerials.has(serial)){ smResults.push({serial,status:'discarded',source:'discarded'}); continue; }
+    if(S.manualRows.has(serial)){ const m=S.manualRows.get(serial); smResults.push({serial,status:'ok',source:'manual',row:m,minors:[],alsoIn:[]}); continue; }
     const allFound=smByPak.get(serial)||[];
-
-    if(allFound.length===0){
-      smResults.push({ serial, status:'missing', source:'smartnet' });
-      continue;
-    }
-
+    if(allFound.length===0){ smResults.push({serial,status:'missing',source:'smartnet'}); continue; }
     const mine =allFound.filter(r=> clientIsSelected(r['End Customer Name']));
     const other=allFound.filter(r=>!clientIsSelected(r['End Customer Name']));
-
     if(mine.length>0){
-      const row   =mine[0];
-      const minors=smByParent.get(serial)||[];
-      const alsoIn=other.length>0?[...new Set(other.map(r=>r['End Customer Name']))] : [];
-      smResults.push({ serial, status:'ok', source:'smartnet', row, minors, alsoIn });
+      smResults.push({serial,status:'ok',source:'smartnet',row:mine[0],minors:smByParent.get(serial)||[],alsoIn:other.length>0?[...new Set(other.map(r=>r['End Customer Name']))]:[]});
     } else if(S.claimedSerials.has(serial)){
-      // User manually claimed this wrong-client serial
-      const row   =other[0];
-      const minors=smByParent.get(serial)||[];
-      smResults.push({ serial, status:'ok', source:'claimed', row, minors, alsoIn:[], claimedFrom:[...new Set(other.map(r=>r['End Customer Name']))] });
+      smResults.push({serial,status:'ok',source:'claimed',row:other[0],minors:smByParent.get(serial)||[],alsoIn:[],claimedFrom:[...new Set(other.map(r=>r['End Customer Name']))]});
     } else {
-      smResults.push({
-        serial, status:'wrong-client', source:'smartnet',
-        row:other[0],
-        wrongClients:[...new Set(other.map(r=>r['End Customer Name']))],
-        minors: smByParent.get(serial)||[]
-      });
+      smResults.push({serial,status:'wrong-client',source:'smartnet',row:other[0],wrongClients:[...new Set(other.map(r=>r['End Customer Name']))],minors:smByParent.get(serial)||[]});
     }
   }
 
-  // Subscriptions
   const subResults=[];
   for(const row of S.subsRows){
     if(row['Major/Minor']!=='Major') continue;
-    if(clientIsSelected(row['End Customer Name']))
-      subResults.push({ status:'ok', source:'subscription', row, minors:[] });
+    if(clientIsSelected(row['End Customer Name'])) subResults.push({status:'ok',source:'subscription',row,minors:[]});
   }
 
-  S.results={ smartnet:smResults, subscriptions:subResults, config };
+  S.results={smartnet:smResults,subscriptions:subResults,config};
   buildAllItems();
   renderResults();
   if(!silent) goToTab('results');
@@ -710,47 +685,35 @@ function processData(silent=false) {
 
 function buildAllItems() {
   const {smartnet,subscriptions}=S.results;
-  S.allItems=[
-    ...smartnet,
-    ...subscriptions.map(s=>({...s, serial:s.row['Subscription ID/Contract Number']||''}))
-  ];
+  S.allItems=[...smartnet,...subscriptions.map(s=>({...s,serial:s.row['Subscription ID/Contract Number']||''}))];
 }
 
 // ─── MANUAL ASSIGNMENT ────────────────────────────────────
 function openModal(serial, prefillRow) {
   S.pendingManual=serial;
   document.getElementById('modal-serial-label').textContent=serial;
-  document.getElementById('modal-title').textContent=
-    S.manualRows.has(serial)?'Editar datos manuales':'Agregar datos manualmente';
-
+  document.getElementById('modal-title').textContent=S.manualRows.has(serial)?'Editar datos manuales':'Agregar datos manualmente';
   const existing=S.manualRows.get(serial)||prefillRow||{};
-  document.getElementById('m-model').value   = cleanText(existing['Product /Offer Name']||'');
-  document.getElementById('m-desc').value    = cleanText(existing['Description']||'');
-  document.getElementById('m-contract').value= existing['Subscription ID/Contract Number']||'';
-  document.getElementById('m-level').value   = existing['Service Level/Offer Type']||'';
-  document.getElementById('m-client').value  = existing['End Customer Name']||[...S.selectedClients][0]||'';
-  document.getElementById('m-addr').value    = existing['_addr']||buildAddress(existing);
-
-  // Convert dates
+  document.getElementById('m-model').value   =cleanText(existing['Product /Offer Name']||'');
+  document.getElementById('m-desc').value    =cleanText(existing['Description']||'');
+  document.getElementById('m-contract').value=existing['Subscription ID/Contract Number']||'';
+  document.getElementById('m-level').value   =existing['Service Level/Offer Type']||'';
+  document.getElementById('m-client').value  =existing['End Customer Name']||[...S.selectedClients][0]||'';
+  document.getElementById('m-addr').value    =existing['_addr']||buildAddress(existing);
   function ciscoDateToISO(d){
     if(!d) return '';
-    const mo={'Jan':'01','Feb':'02','Mar':'03','Apr':'04','May':'05','Jun':'06',
-               'Jul':'07','Aug':'08','Sep':'09','Oct':'10','Nov':'11','Dec':'12'};
+    const mo={'Jan':'01','Feb':'02','Mar':'03','Apr':'04','May':'05','Jun':'06','Jul':'07','Aug':'08','Sep':'09','Oct':'10','Nov':'11','Dec':'12'};
     const m=d.match(/(\d{1,2})-([A-Za-z]+)-(\d{4})/);
     if(m) return `${m[3]}-${mo[m[2]]||'01'}-${m[1].padStart(2,'0')}`;
     return '';
   }
   document.getElementById('m-start').value=ciscoDateToISO(existing['Start Date']||existing['_start']||'');
   document.getElementById('m-end').value  =ciscoDateToISO(existing['End Date']  ||existing['_end']  ||'');
-
   document.getElementById('modal-overlay').classList.remove('hidden');
   document.getElementById('m-model').focus();
 }
 
-function closeModal() {
-  document.getElementById('modal-overlay').classList.add('hidden');
-  S.pendingManual=null;
-}
+function closeModal() { document.getElementById('modal-overlay').classList.add('hidden'); S.pendingManual=null; }
 
 function saveManualRow() {
   const serial=S.pendingManual; if(!serial) return;
@@ -761,52 +724,34 @@ function saveManualRow() {
     return `${day}-${mo[parseInt(m,10)-1]}-${y}`;
   }
   S.manualRows.set(serial,{
-    'Product /Offer Name':              document.getElementById('m-model').value.trim(),
-    'Description':                      document.getElementById('m-desc').value.trim(),
-    'Subscription ID/Contract Number':  document.getElementById('m-contract').value.trim(),
-    'Service Level/Offer Type':         document.getElementById('m-level').value.trim(),
-    'End Customer Name':                document.getElementById('m-client').value.trim(),
-    'Start Date':                       isoToCisco(document.getElementById('m-start').value),
-    'End Date':                         isoToCisco(document.getElementById('m-end').value),
-    'Major/Minor':                      'Major',
-    'PAK/Serial Number':                serial,
-    '_addr':                            document.getElementById('m-addr').value.trim(),
-    'Status':                           'ACTIVE',
-    'Quantity':                         '1',
+    'Product /Offer Name':             document.getElementById('m-model').value.trim(),
+    'Description':                     document.getElementById('m-desc').value.trim(),
+    'Subscription ID/Contract Number': document.getElementById('m-contract').value.trim(),
+    'Service Level/Offer Type':        document.getElementById('m-level').value.trim(),
+    'End Customer Name':               document.getElementById('m-client').value.trim(),
+    'Start Date':                      isoToCisco(document.getElementById('m-start').value),
+    'End Date':                        isoToCisco(document.getElementById('m-end').value),
+    'Major/Minor':'Major','PAK/Serial Number':serial,
+    '_addr':document.getElementById('m-addr').value.trim(),'Status':'ACTIVE','Quantity':'1',
   });
-  closeModal();
-  processData(true);
+  closeModal(); processData(true);
 }
 
-function claimSerial(serial) {
-  S.claimedSerials.add(serial);
-  processData(true);
-}
-
-function unclaimSerial(serial) {
-  S.claimedSerials.delete(serial);
-  processData(true);
-}
-
-function discardSerial(serial) {
-  S.discardedSerials.add(serial);
-  processData(true);
-}
-
-function restoreSerial(serial) {
-  S.discardedSerials.delete(serial);
-  processData(true);
-}
+function claimSerial(serial)   { S.claimedSerials.add(serial);    processData(true); }
+function unclaimSerial(serial) { S.claimedSerials.delete(serial); processData(true); }
+function discardSerial(serial) { S.discardedSerials.add(serial);  processData(true); }
+function restoreSerial(serial) { S.discardedSerials.delete(serial); processData(true); }
+function removeManual(serial)  { S.manualRows.delete(serial);     processData(true); }
 
 // ─── RENDER ───────────────────────────────────────────────
 const STAT={
-  ok:             {label:'OK',                cls:'bg-green-100 text-green-800'},
-  missing:        {label:'No encontrado',     cls:'bg-red-100 text-red-800'},
-  'wrong-client': {label:'Cliente incorrecto',cls:'bg-orange-100 text-orange-800'},
-  claimed:        {label:'Reclamado',         cls:'bg-teal-100 text-teal-800'},
-  manual:         {label:'Manual',            cls:'bg-blue-100 text-blue-800'},
-  subscription:   {label:'Suscripción',       cls:'bg-purple-100 text-purple-800'},
-  discarded:      {label:'Descartado',        cls:'bg-gray-100 text-gray-400'},
+  ok:{label:'OK',cls:'bg-green-100 text-green-800'},
+  missing:{label:'No encontrado',cls:'bg-red-100 text-red-800'},
+  'wrong-client':{label:'Cliente incorrecto',cls:'bg-orange-100 text-orange-800'},
+  claimed:{label:'Reclamado',cls:'bg-teal-100 text-teal-800'},
+  manual:{label:'Manual',cls:'bg-blue-100 text-blue-800'},
+  subscription:{label:'Suscripción',cls:'bg-purple-100 text-purple-800'},
+  discarded:{label:'Descartado',cls:'bg-gray-100 text-gray-400'},
 };
 
 function renderResults() {
@@ -815,53 +760,40 @@ function renderResults() {
   const counts={ok:0,missing:0,'wrong-client':0,subscription:subscriptions.length,discarded:0};
   smartnet.forEach(r=>{ counts[r.status]=(counts[r.status]||0)+1; });
 
-  // Coverage alert
   const alertEl=document.getElementById('coverage-alert');
   const bad=counts.missing+(counts['wrong-client']||0);
   if(bad>0){
     const parts=[];
-    if(counts.missing>0) parts.push(`<strong>${counts.missing}</strong> no encontrada(s) en la BD`);
-    if(counts['wrong-client']>0) parts.push(`<strong>${counts['wrong-client']}</strong> asignada(s) a otro cliente`);
+    if(counts.missing>0) parts.push(`<strong>${counts.missing}</strong> no encontrada(s)`);
+    if(counts['wrong-client']>0) parts.push(`<strong>${counts['wrong-client']}</strong> en otro cliente`);
     alertEl.className='rounded-xl p-4 mb-5 border border-orange-200 bg-orange-50 text-orange-800 text-sm';
-    alertEl.innerHTML=`⚠ <strong>Cobertura incompleta:</strong> De ${serialList.length} series — ${parts.join(' · ')}. Usa las opciones de cada fila para resolver.`;
+    alertEl.innerHTML=`⚠ <strong>Cobertura incompleta:</strong> De ${serialList.length} series — ${parts.join(' · ')}.`;
     document.getElementById('complement-panel').classList.remove('hidden');
   } else {
     alertEl.className='rounded-xl p-4 mb-5 border border-green-200 bg-green-50 text-green-800 text-sm';
-    alertEl.innerHTML=`✓ <strong>Cobertura completa:</strong> Las ${serialList.length} series están localizadas y asignadas correctamente.`;
+    alertEl.innerHTML=`✓ <strong>Cobertura completa:</strong> Las ${serialList.length} series están localizadas.`;
     document.getElementById('complement-panel').classList.add('hidden');
   }
   alertEl.classList.remove('hidden');
 
-  // Summary cards
   document.getElementById('results-summary').innerHTML=[
-    {label:`OK (${counts.ok} de ${serialList.length})`, value:counts.ok,              cls:'text-green-600',  bg:'border-green-200'},
-    {label:'No encontradas',                            value:counts.missing,          cls:'text-red-600',    bg:'border-red-200'},
-    {label:'Cliente incorrecto',                        value:counts['wrong-client']||0,cls:'text-orange-600',bg:'border-orange-200'},
-    {label:'Suscripciones',                             value:counts.subscription,     cls:'text-purple-600', bg:'border-purple-200'},
-    {label:'Total resultados',                          value:S.allItems.length,       cls:'text-blue-600',   bg:'border-blue-200'},
-  ].map(s=>`
-    <div class="bg-white rounded-xl shadow-sm border ${s.bg} p-4 text-center">
-      <div class="text-3xl font-bold ${s.cls}">${s.value}</div>
-      <div class="text-xs text-gray-500 mt-1 font-medium leading-tight">${s.label}</div>
-    </div>`).join('');
+    {label:`OK (${counts.ok} de ${serialList.length})`,value:counts.ok,cls:'text-green-600',bg:'border-green-200'},
+    {label:'No encontradas',value:counts.missing,cls:'text-red-600',bg:'border-red-200'},
+    {label:'Cliente incorrecto',value:counts['wrong-client']||0,cls:'text-orange-600',bg:'border-orange-200'},
+    {label:'Suscripciones',value:counts.subscription,cls:'text-purple-600',bg:'border-purple-200'},
+    {label:'Total resultados',value:S.allItems.length,cls:'text-blue-600',bg:'border-blue-200'},
+  ].map(s=>`<div class="bg-white rounded-xl shadow-sm border ${s.bg} p-4 text-center"><div class="text-3xl font-bold ${s.cls}">${s.value}</div><div class="text-xs text-gray-500 mt-1 font-medium leading-tight">${s.label}</div></div>`).join('');
 
-  // Filter buttons
   S.activeFilter='all';
   document.getElementById('filter-buttons').innerHTML=[
-    {key:'all',          label:`Todos (${S.allItems.length})`},
-    {key:'ok',           label:`OK (${counts.ok})`},
-    {key:'missing',      label:`No encontrado (${counts.missing})`},
-    {key:'wrong-client', label:`Cliente incorrecto (${counts['wrong-client']||0})`},
-    {key:'subscription', label:`Suscripciones (${counts.subscription})`},
-    {key:'discarded',    label:`Descartados (${counts.discarded||0})`},
-  ].map(f=>`
-    <button class="filter-btn px-4 py-3 text-sm ${S.activeFilter===f.key?'active':''}"
-      data-fkey="${f.key}">${f.label}</button>`).join('');
-
-  document.querySelectorAll('.filter-btn').forEach(b=>{
-    b.addEventListener('click',()=>setFilter(b.dataset.fkey));
-  });
-
+    {key:'all',label:`Todos (${S.allItems.length})`},
+    {key:'ok',label:`OK (${counts.ok})`},
+    {key:'missing',label:`No encontrado (${counts.missing})`},
+    {key:'wrong-client',label:`Cliente incorrecto (${counts['wrong-client']||0})`},
+    {key:'subscription',label:`Suscripciones (${counts.subscription})`},
+    {key:'discarded',label:`Descartados (${counts.discarded||0})`},
+  ].map(f=>`<button class="filter-btn px-4 py-3 text-sm ${S.activeFilter===f.key?'active':''}" data-fkey="${f.key}">${f.label}</button>`).join('');
+  document.querySelectorAll('.filter-btn').forEach(b=>{ b.addEventListener('click',()=>setFilter(b.dataset.fkey)); });
   renderTable();
 }
 
@@ -877,127 +809,68 @@ function renderTable() {
   if(S.activeFilter!=='all')
     filtered=filtered.filter(item=>
       S.activeFilter==='subscription'?item.source==='subscription':
-      S.activeFilter==='discarded'   ?item.status==='discarded':
-      item.status===S.activeFilter
-    );
-  if(search)
-    filtered=filtered.filter(item=>{
-      const row=item.row||{};
-      return (item.serial||'').toLowerCase().includes(search)||
-             cleanText(row['Product /Offer Name']||'').toLowerCase().includes(search)||
-             cleanText(row['Description']||'').toLowerCase().includes(search);
-    });
+      S.activeFilter==='discarded'?item.status==='discarded':item.status===S.activeFilter);
+  if(search) filtered=filtered.filter(item=>{
+    const row=item.row||{};
+    return (item.serial||'').toLowerCase().includes(search)||
+           cleanText(row['Product /Offer Name']||'').toLowerCase().includes(search)||
+           cleanText(row['Description']||'').toLowerCase().includes(search);
+  });
 
   const tbody=document.getElementById('results-tbody');
-  if(filtered.length===0){
-    tbody.innerHTML=`<tr><td colspan="12" class="px-4 py-8 text-center text-gray-400">Sin registros en esta categoría</td></tr>`;
-    return;
-  }
+  if(filtered.length===0){ tbody.innerHTML=`<tr><td colspan="12" class="px-4 py-8 text-center text-gray-400">Sin registros en esta categoría</td></tr>`; return; }
 
   const rowStore=new Map();
-
   const rows=filtered.map((item,idx)=>{
     rowStore.set(idx,item);
     const effectiveStatus=item.source==='claimed'?'claimed':item.source==='manual'?'manual':item.source==='subscription'?'subscription':item.status;
-    const st  =STAT[effectiveStatus]||STAT.ok;
-    const row =item.row||{};
-    const loc =S.locationMap.get(item.serial||'')||'';
-    const typeLabel=item.source==='subscription'?'SUSCRIPCIÓN':
-                    (item.status==='missing'||item.status==='discarded')?'—':
-                    item.source==='manual'?'MANUAL':'CHASSIS';
-
-    // Extra info line
+    const st=STAT[effectiveStatus]||STAT.ok;
+    const row=item.row||{};
+    const loc=S.locationMap.get(item.serial||'')||'';
+    const typeLabel=item.source==='subscription'?'SUSCRIPCIÓN':(item.status==='missing'||item.status==='discarded')?'—':item.source==='manual'?'MANUAL':'CHASSIS';
     let extra='';
-    if(item.alsoIn&&item.alsoIn.length>0)
-      extra=`<div class="text-xs text-yellow-600 mt-1">⚠ También en: ${esc(item.alsoIn.join(', '))}</div>`;
-    if(item.wrongClients)
-      extra=`<div class="text-xs text-orange-500 mt-1">${esc(item.wrongClients.join(' / '))}</div>`;
-    if(item.claimedFrom)
-      extra=`<div class="text-xs text-teal-600 mt-1">Reclamado desde: ${esc(item.claimedFrom.join(', '))}</div>`;
-
-    // Action column — uses data-idx + data-action; no serial in onclick string
+    if(item.alsoIn&&item.alsoIn.length>0) extra=`<div class="text-xs text-yellow-600 mt-1">⚠ También en: ${esc(item.alsoIn.join(', '))}</div>`;
+    if(item.wrongClients) extra=`<div class="text-xs text-orange-500 mt-1">${esc(item.wrongClients.join(' / '))}</div>`;
+    if(item.claimedFrom) extra=`<div class="text-xs text-teal-600 mt-1">Reclamado desde: ${esc(item.claimedFrom.join(', '))}</div>`;
     let action='';
     if(item.status==='discarded'){
-      action=`
-        <button data-idx="${idx}" data-action="restore-discard"
-          class="text-xs border border-gray-300 hover:bg-gray-50 text-gray-600 px-2.5 py-1 rounded-md font-medium whitespace-nowrap">
-          Restaurar
-        </button>`;
+      action=`<button data-idx="${idx}" data-action="restore-discard" class="text-xs border border-gray-300 hover:bg-gray-50 text-gray-600 px-2.5 py-1 rounded-md font-medium whitespace-nowrap">Restaurar</button>`;
     } else if(item.status==='missing'&&item.source!=='manual'){
-      action=`
-        <div class="flex flex-col gap-1">
-          <button data-idx="${idx}" data-action="open-modal"
-            class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-md font-medium whitespace-nowrap">
-            Agregar manualmente
-          </button>
-          <button data-idx="${idx}" data-action="discard"
-            class="text-xs text-red-400 hover:text-red-600 px-2.5 py-1 font-medium whitespace-nowrap">
-            Descartar
-          </button>
-        </div>`;
+      action=`<div class="flex flex-col gap-1">
+        <button data-idx="${idx}" data-action="open-modal" class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-md font-medium whitespace-nowrap">Agregar manualmente</button>
+        <button data-idx="${idx}" data-action="discard" class="text-xs text-red-400 hover:text-red-600 px-2.5 py-1 font-medium whitespace-nowrap">Descartar</button></div>`;
     } else if(item.status==='wrong-client'){
-      action=`
-        <div class="flex flex-col gap-1">
-          <button data-idx="${idx}" data-action="claim"
-            class="text-xs bg-teal-600 hover:bg-teal-700 text-white px-2.5 py-1 rounded-md font-medium whitespace-nowrap">
-            Es mi cliente ✓
-          </button>
-          <button data-idx="${idx}" data-action="open-modal"
-            class="text-xs border border-gray-300 hover:bg-gray-50 px-2.5 py-1 rounded-md font-medium whitespace-nowrap">
-            Capturar datos
-          </button>
-          <button data-idx="${idx}" data-action="discard"
-            class="text-xs text-red-400 hover:text-red-600 px-2.5 py-1 font-medium whitespace-nowrap">
-            Descartar
-          </button>
-        </div>`;
+      action=`<div class="flex flex-col gap-1">
+        <button data-idx="${idx}" data-action="claim" class="text-xs bg-teal-600 hover:bg-teal-700 text-white px-2.5 py-1 rounded-md font-medium whitespace-nowrap">Es mi cliente ✓</button>
+        <button data-idx="${idx}" data-action="open-modal" class="text-xs border border-gray-300 hover:bg-gray-50 px-2.5 py-1 rounded-md font-medium whitespace-nowrap">Capturar datos</button>
+        <button data-idx="${idx}" data-action="discard" class="text-xs text-red-400 hover:text-red-600 px-2.5 py-1 font-medium whitespace-nowrap">Descartar</button></div>`;
     } else if(item.status==='ok'&&(item.source==='manual'||item.source==='claimed')){
       const removeAct=item.source==='claimed'?'unclaim':'remove-manual';
-      action=`
-        <div class="flex flex-col gap-1">
-          <button data-idx="${idx}" data-action="open-modal"
-            class="text-xs border border-gray-300 hover:bg-gray-50 px-2.5 py-1 rounded-md font-medium">
-            Editar
-          </button>
-          <button data-idx="${idx}" data-action="${removeAct}"
-            class="text-xs text-red-500 hover:text-red-700 px-2.5 py-1 font-medium">
-            Quitar
-          </button>
-        </div>`;
+      action=`<div class="flex flex-col gap-1">
+        <button data-idx="${idx}" data-action="open-modal" class="text-xs border border-gray-300 hover:bg-gray-50 px-2.5 py-1 rounded-md font-medium">Editar</button>
+        <button data-idx="${idx}" data-action="${removeAct}" class="text-xs text-red-500 hover:text-red-700 px-2.5 py-1 font-medium">Quitar</button></div>`;
     }
-
     return `<tr class="border-b border-gray-50 hover:bg-slate-50">
-      <td class="px-4 py-3 align-top whitespace-nowrap">
-        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${st.cls}">${st.label}</span>
-        ${extra}
-      </td>
+      <td class="px-4 py-3 align-top whitespace-nowrap"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${st.cls}">${st.label}</span>${extra}</td>
       <td class="px-4 py-3 align-top text-xs text-gray-400 font-medium whitespace-nowrap">${typeLabel}</td>
       <td class="px-4 py-3 align-top font-mono text-xs font-semibold text-gray-800 whitespace-nowrap">${esc(item.serial)}</td>
       <td class="px-4 py-3 align-top text-xs font-semibold text-gray-700 whitespace-nowrap">${esc(cleanText(row['Product /Offer Name']||''))}</td>
-      <td class="px-4 py-3 align-top text-xs text-gray-500" style="max-width:200px">
-        <div class="line-clamp-2">${esc(cleanText(row['Description']||''))}</div>
-      </td>
-      <td class="px-4 py-3 align-top text-xs text-gray-600" style="max-width:180px">
-        <div class="line-clamp-2">${esc(row['End Customer Name']||'—')}</div>
-      </td>
+      <td class="px-4 py-3 align-top text-xs text-gray-500" style="max-width:200px"><div class="line-clamp-2">${esc(cleanText(row['Description']||''))}</div></td>
+      <td class="px-4 py-3 align-top text-xs text-gray-600" style="max-width:180px"><div class="line-clamp-2">${esc(row['End Customer Name']||'—')}</div></td>
       <td class="px-4 py-3 align-top text-xs text-gray-500 whitespace-nowrap">${esc(row['Subscription ID/Contract Number']||'—')}</td>
       <td class="px-4 py-3 align-top text-xs text-gray-500 whitespace-nowrap">${esc(row['Service Level/Offer Type']||'—')}</td>
       <td class="px-4 py-3 align-top text-xs text-gray-500 whitespace-nowrap">${esc(row['Start Date']||'—')}</td>
       <td class="px-4 py-3 align-top text-xs text-gray-500 whitespace-nowrap">${esc(row['End Date']||'—')}</td>
       <td class="px-4 py-3 align-top text-xs text-gray-500">${esc(loc||'—')}</td>
-      <td class="px-4 py-3 align-top">${action}</td>
-    </tr>`;
+      <td class="px-4 py-3 align-top">${action}</td></tr>`;
   });
 
   tbody.innerHTML=rows.join('');
-
-  // Attach all action handlers — no serial ever touches an onclick string
   tbody.querySelectorAll('[data-action]').forEach(btn=>{
     btn.addEventListener('click',()=>{
-      const item=rowStore.get(parseInt(btn.dataset.idx,10));
-      if(!item) return;
+      const item=rowStore.get(parseInt(btn.dataset.idx,10)); if(!item) return;
       const act=btn.dataset.action;
-      if     (act==='open-modal')      openModal(item.serial, item.row||{});
+      if     (act==='open-modal')      openModal(item.serial,item.row||{});
       else if(act==='claim')           claimSerial(item.serial);
       else if(act==='unclaim')         unclaimSerial(item.serial);
       else if(act==='remove-manual')   removeManual(item.serial);
@@ -1007,100 +880,34 @@ function renderTable() {
   });
 }
 
-function removeManual(serial) {
-  S.manualRows.delete(serial);
-  processData(true);
-}
-
 // ─── EXPORT ───────────────────────────────────────────────
 const INV_HEADERS=['NAME','Type','Model','Serial','Status','Descripción','Nombre cliente',
   'Numero de PRY','No de Contrato Smartnet','Inicio SMARNET','Fin de SMARNET',
   'Nivel de Servicio','INICIO DE CEN SUPPORT','FIN DE CEN SUPPORT','TIPO CEN SUPPORT',
   'ASSOCIATEDTO','ELEMENT','LOCATION','DIRECCION ENTREGA SMARNET',
   'RMA','NUEVO NÚMERO DE SERIE','SC','Mantenimiento','Cantidad','Contrato/ID','Inicio','Fin'];
-
 const COL_W=[20,10,22,22,10,42,42,20,24,14,14,18,20,18,16,14,28,38,48,8,24,20,14,10,22,14,14];
-
 function makeRow(d){ const r={}; INV_HEADERS.forEach(h=>r[h]=d[h]??''); return r; }
 
 function buildInventarioRows(config) {
   const rows=[];
   const {smartnet,subscriptions}=S.results;
-
   for(const item of smartnet){
-    if(item.status!=='ok' && item.status!=='wrong-client') continue;
+    if(item.status!=='ok'&&item.status!=='wrong-client') continue;
     const row=item.row, serial=item.serial;
-    const loc =S.locationMap.get(serial)||'';
+    const loc=S.locationMap.get(serial)||'';
     const addr=item.source==='manual'?(row['_addr']||''):buildAddress(row);
-
-    rows.push(makeRow({
-      NAME:serial, Type:'CHASSIS',
-      Model:                  cleanText(row['Product /Offer Name']),
-      Serial:                 serial,
-      Status:                 row['Status']||'ACTIVE',
-      'Descripción':          cleanText(row['Description']),
-      'Nombre cliente':       config.clientOficial||row['End Customer Name']||'',
-      'Numero de PRY':        config.pry,
-      'No de Contrato Smartnet':row['Subscription ID/Contract Number']||'',
-      'Inicio SMARNET':       row['Start Date']||'',
-      'Fin de SMARNET':       row['End Date']||'',
-      'Nivel de Servicio':    row['Service Level/Offer Type']||'',
-      'INICIO DE CEN SUPPORT':fmtConfigDate(config.inicioCen),
-      'FIN DE CEN SUPPORT':   fmtConfigDate(config.finCen),
-      'TIPO CEN SUPPORT':     config.tipoCen,
-      ASSOCIATEDTO:1, ELEMENT:'GENERAL_CLIENTE',
-      LOCATION:loc, 'DIRECCION ENTREGA SMARNET':addr,
-      SC:config.sc, Cantidad:row['Quantity']||1,
-    }));
-
+    rows.push(makeRow({NAME:serial,Type:'CHASSIS',Model:cleanText(row['Product /Offer Name']),Serial:serial,Status:row['Status']||'ACTIVE','Descripción':cleanText(row['Description']),'Nombre cliente':config.clientOficial||row['End Customer Name']||'','Numero de PRY':config.pry,'No de Contrato Smartnet':row['Subscription ID/Contract Number']||'','Inicio SMARNET':row['Start Date']||'','Fin de SMARNET':row['End Date']||'','Nivel de Servicio':row['Service Level/Offer Type']||'','INICIO DE CEN SUPPORT':fmtConfigDate(config.inicioCen),'FIN DE CEN SUPPORT':fmtConfigDate(config.finCen),'TIPO CEN SUPPORT':config.tipoCen,ASSOCIATEDTO:1,ELEMENT:'GENERAL_CLIENTE',LOCATION:loc,'DIRECCION ENTREGA SMARNET':addr,SC:config.sc,Cantidad:row['Quantity']||1}));
     let n=1;
     for(const minor of (item.minors||[])){
       const mSerial=`${serial}_DA${n}`;
-      rows.push(makeRow({
-        NAME:mSerial, Type:'SOFTWARE',
-        Model:                  cleanText(minor['Product /Offer Name']),
-        Serial:                 mSerial,
-        Status:                 minor['Status']||'ACTIVE',
-        'Descripción':          cleanText(minor['Description']),
-        'Nombre cliente':       config.clientOficial||minor['End Customer Name']||'',
-        'Numero de PRY':        config.pry,
-        'No de Contrato Smartnet':minor['Subscription ID/Contract Number']||'',
-        'Inicio SMARNET':       minor['Start Date']||'',
-        'Fin de SMARNET':       minor['End Date']||'',
-        'Nivel de Servicio':    minor['Service Level/Offer Type']||'',
-        'INICIO DE CEN SUPPORT':fmtConfigDate(config.inicioCen),
-        'FIN DE CEN SUPPORT':   fmtConfigDate(config.finCen),
-        'TIPO CEN SUPPORT':     config.tipoCen,
-        ASSOCIATEDTO:2, ELEMENT:serial,
-        LOCATION:loc, 'DIRECCION ENTREGA SMARNET':buildAddress(minor),
-        SC:config.sc, Cantidad:minor['Quantity']||1,
-      }));
+      rows.push(makeRow({NAME:mSerial,Type:'SOFTWARE',Model:cleanText(minor['Product /Offer Name']),Serial:mSerial,Status:minor['Status']||'ACTIVE','Descripción':cleanText(minor['Description']),'Nombre cliente':config.clientOficial||minor['End Customer Name']||'','Numero de PRY':config.pry,'No de Contrato Smartnet':minor['Subscription ID/Contract Number']||'','Inicio SMARNET':minor['Start Date']||'','Fin de SMARNET':minor['End Date']||'','Nivel de Servicio':minor['Service Level/Offer Type']||'','INICIO DE CEN SUPPORT':fmtConfigDate(config.inicioCen),'FIN DE CEN SUPPORT':fmtConfigDate(config.finCen),'TIPO CEN SUPPORT':config.tipoCen,ASSOCIATEDTO:2,ELEMENT:serial,LOCATION:loc,'DIRECCION ENTREGA SMARNET':buildAddress(minor),SC:config.sc,Cantidad:minor['Quantity']||1}));
       n++;
     }
   }
-
   for(const item of subscriptions){
     const row=item.row, contract=row['Subscription ID/Contract Number']||'';
-    rows.push(makeRow({
-      NAME:'', Type:'SOFTWARE',
-      Model:                  cleanText(row['Product /Offer Name']),
-      Serial:                 contract,
-      Status:                 row['Status']||'ACTIVE',
-      'Descripción':          cleanText(row['Description']),
-      'Nombre cliente':       config.clientOficial||row['End Customer Name']||'',
-      'Numero de PRY':        config.pry,
-      'No de Contrato Smartnet':contract,
-      'Inicio SMARNET':       row['Start Date']||'',
-      'Fin de SMARNET':       row['End Date']||'',
-      'Nivel de Servicio':    row['Service Level/Offer Type']||'',
-      'INICIO DE CEN SUPPORT':fmtConfigDate(config.inicioCen),
-      'FIN DE CEN SUPPORT':   fmtConfigDate(config.finCen),
-      'TIPO CEN SUPPORT':     config.tipoCen,
-      ASSOCIATEDTO:1, ELEMENT:'GENERAL_CLIENTE',
-      LOCATION:'', 'DIRECCION ENTREGA SMARNET':buildAddress(row),
-      SC:config.sc, Cantidad:row['Quantity']||1,
-      'Contrato/ID':contract, Inicio:row['Start Date']||'', Fin:row['End Date']||'',
-    }));
+    rows.push(makeRow({NAME:'',Type:'SOFTWARE',Model:cleanText(row['Product /Offer Name']),Serial:contract,Status:row['Status']||'ACTIVE','Descripción':cleanText(row['Description']),'Nombre cliente':config.clientOficial||row['End Customer Name']||'','Numero de PRY':config.pry,'No de Contrato Smartnet':contract,'Inicio SMARNET':row['Start Date']||'','Fin de SMARNET':row['End Date']||'','Nivel de Servicio':row['Service Level/Offer Type']||'','INICIO DE CEN SUPPORT':fmtConfigDate(config.inicioCen),'FIN DE CEN SUPPORT':fmtConfigDate(config.finCen),'TIPO CEN SUPPORT':config.tipoCen,ASSOCIATEDTO:1,ELEMENT:'GENERAL_CLIENTE',LOCATION:'','DIRECCION ENTREGA SMARNET':buildAddress(row),SC:config.sc,Cantidad:row['Quantity']||1,'Contrato/ID':contract,Inicio:row['Start Date']||'',Fin:row['End Date']||''}));
   }
   return rows;
 }
@@ -1110,39 +917,25 @@ function exportExcel(){
   const config=S.results.config;
   const invRows=buildInventarioRows(config);
   const wb=XLSX.utils.book_new();
-
   if(invRows.length>0){
     const data=[INV_HEADERS,...invRows.map(r=>INV_HEADERS.map(h=>r[h]))];
     const ws=XLSX.utils.aoa_to_sheet(data);
     ws['!cols']=COL_W.map(w=>({wch:w}));
     XLSX.utils.book_append_sheet(wb,ws,'FO-PMO-003_Confidencial');
   }
-
-  const valItems=S.results.smartnet.filter(r=>r.status!=='ok' && r.status!=='discarded');
+  const valItems=S.results.smartnet.filter(r=>r.status!=='ok'&&r.status!=='discarded');
   if(valItems.length>0){
     const vH=['Serial','Estado','Clientes encontrados en Cisco','Acción requerida'];
-    const vD=[vH,...valItems.map(r=>[
-      r.serial,
-      r.status==='missing'?'No encontrado en BD de Cisco':'Asignado a otro cliente',
-      (r.wrongClients||[]).join('; '),
-      r.status==='wrong-client'
-        ?'Gestionar cambio de cliente con el área de Compras'
-        :'Verificar el número de serie o descargar archivo complementario de Cisco'
-    ])];
+    const vD=[vH,...valItems.map(r=>[r.serial,r.status==='missing'?'No encontrado en BD de Cisco':'Asignado a otro cliente',(r.wrongClients||[]).join('; '),r.status==='wrong-client'?'Gestionar cambio de cliente':'Verificar número de serie'])];
     const wsV=XLSX.utils.aoa_to_sheet(vD);
     wsV['!cols']=[{wch:22},{wch:30},{wch:60},{wch:55}];
     XLSX.utils.book_append_sheet(wb,wsV,'VALIDACION');
   }
-
   if(wb.SheetNames.length===0){ alert('No hay datos para exportar.'); return; }
   XLSX.writeFile(wb,'FO-SAD-5.7 Plantilla de inventario.xlsx');
 }
 
-// Close modal on overlay click
-document.getElementById('modal-overlay').addEventListener('click',e=>{
-  if(e.target===e.currentTarget) closeModal();
-});
-
+document.getElementById('modal-overlay').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeModal(); });
 </script>
 </body>
 </html>
