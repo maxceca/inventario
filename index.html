@@ -6,6 +6,9 @@
 <title>CEN Systems — SmartNet Cisco Tool</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.4/dist/pizzip.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docxtemplater@3.44.0/build/docxtemplater.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 <style>
   body { font-family: 'Segoe UI', system-ui, sans-serif; }
   .tab-btn   { color:#6b7280; border-bottom:2px solid transparent; transition:all .15s; }
@@ -289,10 +292,28 @@
             <input type="text" id="input-sc" placeholder="Ej: SC-260520-002675"
               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
           </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del proyecto <span class="text-gray-400 font-normal">(para la carta)</span></label>
+            <input type="text" id="input-nombre-proyecto" placeholder="Ej: Servicios de Mantenimiento Especializados para el CIAS"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
         </div>
       </div>
 
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 class="text-base font-semibold text-gray-800 mb-4 pb-2 border-b">Destinatario de la Carta</h2>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del contacto <span class="text-red-500">*</span></label>
+            <input type="text" id="input-nombre-contacto" placeholder="Ej: Lic. Juan Pérez García"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Puesto <span class="text-red-500">*</span></label>
+            <input type="text" id="input-puesto" placeholder="Ej: Director de Tecnologías de la Información"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
         <h2 class="text-base font-semibold text-gray-800 mb-4 pb-2 border-b">Soporte CEN</h2>
         <div class="space-y-4">
           <div class="grid grid-cols-2 gap-3">
@@ -343,7 +364,11 @@
        TAB 3 — RESULTADOS
   ══════════════════════════════════════════════ -->
   <div id="tab-results" class="tab-content hidden">
-    <div class="flex justify-end mb-4">
+    <div class="flex justify-end gap-3 mb-4">
+      <button id="btn-export-carta" onclick="exportCarta()" disabled
+        class="bg-green-600 hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg font-semibold transition-colors text-sm shadow-sm">
+        📄 Generar Carta de Activación
+      </button>
       <button id="btn-export-inv" onclick="exportExcel()" disabled
         class="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg font-semibold transition-colors text-sm shadow-sm">
         ⬇ Exportar INVENTARIO + VALIDACION
@@ -681,6 +706,7 @@ function processData(silent=false) {
   renderResults();
   if(!silent) goToTab('results');
   document.getElementById('btn-export-inv').disabled=false;
+  document.getElementById('btn-export-carta').disabled=false;
 }
 
 function buildAllItems() {
@@ -936,6 +962,93 @@ function exportExcel(){
 }
 
 document.getElementById('modal-overlay').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeModal(); });
+
+// ─── GENERAR CARTA DE ACTIVACIÓN ──────────────────────────
+function fechaEspanol(iso) {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-');
+  const meses = ['enero','febrero','marzo','abril','mayo','junio',
+                 'julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  return `${parseInt(d,10)} de ${meses[parseInt(m,10)-1]} de ${y}`;
+}
+
+async function exportCarta() {
+  if (!S.results) return;
+
+  const nombreContacto = document.getElementById('input-nombre-contacto').value.trim();
+  const puesto         = document.getElementById('input-puesto').value.trim();
+  if (!nombreContacto || !puesto) {
+    alert('Para generar la carta completa el Nombre del contacto y Puesto en la pestaña ③ Configurar Proyecto.');
+    goToTab('config');
+    return;
+  }
+
+  const config = S.results.config;
+  const hoy    = new Date();
+  const meses  = ['enero','febrero','marzo','abril','mayo','junio',
+                  'julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const fechaCarta = `${hoy.getDate()} de ${meses[hoy.getMonth()]} de ${hoy.getFullYear()}`;
+
+  // Construir inventario (solo ítems OK)
+  const items = [];
+  for (const item of S.results.smartnet) {
+    if (item.status !== 'ok') continue;
+    const row = item.row || {};
+    items.push({
+      model:       cleanText(row['Product /Offer Name'] || ''),
+      descripcion: cleanText(row['Description'] || ''),
+      serial:      item.serial || '',
+    });
+  }
+  for (const item of S.results.subscriptions) {
+    const row = item.row || {};
+    items.push({
+      model:       cleanText(row['Product /Offer Name'] || ''),
+      descripcion: cleanText(row['Description'] || ''),
+      serial:      row['Subscription ID/Contract Number'] || '',
+    });
+  }
+
+  const templateData = {
+    fecha_carta:      fechaCarta,
+    ciudad:           'Ciudad de México',
+    nombre_contacto:  nombreContacto,
+    puesto:           puesto,
+    empresa:          config.clientOficial || [...S.selectedClients][0] || '',
+    pry:              config.pry || '',
+    nombre_proyecto:  document.getElementById('input-nombre-proyecto').value.trim() || config.pry,
+    tipo_cen:         config.tipoCen || '',
+    inicio_cen:       fechaEspanol(config.inicioCen),
+    fin_cen:          fechaEspanol(config.finCen),
+    sc:               config.sc || '',
+    items,
+  };
+
+  const btn = document.getElementById('btn-export-carta');
+  btn.disabled = true;
+  btn.textContent = '⏳ Generando...';
+
+  try {
+    const templateUrl = 'https://raw.githubusercontent.com/maxceca/inventario/main/carta_template.docx';
+    const resp = await fetch(templateUrl);
+    if (!resp.ok) throw new Error('No se pudo descargar el template');
+    const arrayBuffer = await resp.arrayBuffer();
+
+    const zip  = new PizZip(arrayBuffer);
+    const doc  = new docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+    doc.render(templateData);
+
+    const blob = doc.getZip().generate({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    const empresa = (config.clientOficial || 'cliente').replace(/[^a-zA-Z0-9]/g,'_').slice(0,30);
+    saveAs(blob, `Carta_Activacion_${empresa}.docx`);
+  } catch(e) {
+    alert('Error al generar la carta: ' + e.message);
+    console.error(e);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '📄 Generar Carta de Activación';
+  }
+}
 </script>
 </body>
 </html>
