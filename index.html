@@ -54,6 +54,7 @@
   /* Upload drop zones */
   .upload-zone { border:2px dashed #d1d5db; transition:all .15s; }
   .upload-zone:hover { border-color:var(--cen-green); background:#f8ffe0; }
+  .upload-zone.drag-over { border-color:var(--cen-green); border-style:solid; background:#f0fbe0; }
 
   /* Step circle */
   .step-circle { background:var(--cen-black); color:white; }
@@ -258,7 +259,7 @@
           </div>
           <span id="sn-badge" class="hidden text-xs font-semibold px-2 py-1 rounded-full badge-ok">✓ Cargado</span>
         </div>
-        <label class="upload-zone block w-full cursor-pointer rounded-lg p-4 text-center">
+        <label id="zone-smartnet" class="upload-zone block w-full cursor-pointer rounded-lg p-4 text-center">
           <span class="text-sm text-gray-500">Haz clic o arrastra el archivo .xlsx</span>
           <input type="file" id="file-smartnet" accept=".xlsx,.xls" onchange="loadCiscoFile('smartnet',event)" class="hidden">
         </label>
@@ -273,7 +274,7 @@
           </div>
           <span id="sub-badge" class="hidden text-xs font-semibold px-2 py-1 rounded-full badge-ok">✓ Cargado</span>
         </div>
-        <label class="upload-zone block w-full cursor-pointer rounded-lg p-4 text-center">
+        <label id="zone-subs" class="upload-zone block w-full cursor-pointer rounded-lg p-4 text-center">
           <span class="text-sm text-gray-500">Haz clic o arrastra el archivo .xlsx</span>
           <input type="file" id="file-subs" accept=".xlsx,.xls" onchange="loadCiscoFile('subs',event)" class="hidden">
         </label>
@@ -1034,6 +1035,32 @@ function exportExcel(){
 }
 
 document.getElementById('modal-overlay').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeModal(); });
+
+// ─── DRAG-AND-DROP ────────────────────────────────────────
+function setupDropZone(zoneId, type) {
+  const zone = document.getElementById(zoneId);
+  if (!zone) return;
+
+  // Prevent browser from opening the file when dropped anywhere on the page
+  ['dragenter','dragover','dragleave','drop'].forEach(evt =>
+    zone.addEventListener(evt, e => e.preventDefault())
+  );
+
+  zone.addEventListener('dragenter', () => zone.classList.add('drag-over'));
+  zone.addEventListener('dragover',  () => zone.classList.add('drag-over'));
+  zone.addEventListener('dragleave', e => {
+    // Only remove highlight when the pointer truly leaves the zone (not entering a child)
+    if (!zone.contains(e.relatedTarget)) zone.classList.remove('drag-over');
+  });
+  zone.addEventListener('drop', e => {
+    zone.classList.remove('drag-over');
+    const file = e.dataTransfer && e.dataTransfer.files[0];
+    if (!file) return;
+    loadCiscoFile(type, { target: { files: [file] } });
+  });
+}
+setupDropZone('zone-smartnet', 'smartnet');
+setupDropZone('zone-subs',     'subs');
 
 // ─── GENERAR CARTA DE ACTIVACIÓN ──────────────────────────
 function fechaEspanol(iso) {
