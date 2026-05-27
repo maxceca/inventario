@@ -4,25 +4,74 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CEN Systems — SmartNet Cisco Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.4/dist/pizzip.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/docxtemplater@3.44.0/build/docxtemplater.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 <style>
-  body { font-family: 'Segoe UI', system-ui, sans-serif; }
-  .tab-btn   { color:#6b7280; border-bottom:2px solid transparent; transition:all .15s; }
-  .tab-btn.active { color:#1d4ed8; border-bottom-color:#1d4ed8; font-weight:600; }
-  .filter-btn { color:#6b7280; border-bottom:2px solid transparent; transition:all .15s; }
-  .filter-btn.active { color:#1d4ed8; border-bottom-color:#1d4ed8; font-weight:600; }
+  /* ── CEN Systems Corporate Identity v1.0 ── */
+  :root {
+    --cen-green:      #97D700;
+    --cen-black:      #101820;
+    --cen-gray-dark:  #717C7D;
+    --cen-gray-light: #919D9D;
+    --cen-red-alert:  #D62828;
+    --cen-orange-warn:#F77F00;
+    --cen-bg-soft:    #F5F5F5;
+  }
+  body { font-family: 'Avenir','Open Sans',system-ui,-apple-system,sans-serif; background:var(--cen-bg-soft); }
+  h1,h2,h3,h4 { font-family: 'Avenir','Open Sans',system-ui,sans-serif; }
+
+  /* Tabs */
+  .tab-btn   { color:var(--cen-gray-dark); border-bottom:2px solid transparent; transition:all .15s; }
+  .tab-btn.active { color:var(--cen-black); border-bottom-color:var(--cen-green); font-weight:600; }
+  .filter-btn { color:var(--cen-gray-dark); border-bottom:2px solid transparent; transition:all .15s; }
+  .filter-btn.active { color:var(--cen-black); border-bottom-color:var(--cen-green); font-weight:600; }
+
+  /* Client chips */
   .client-chip { cursor:pointer; user-select:none; transition:all .15s; }
-  .client-chip.selected { background:#1d4ed8; color:white; border-color:#1d4ed8; }
+  .client-chip.selected { background:var(--cen-black); color:white; border-color:var(--cen-black); }
   .client-chip:not(.selected) { background:white; color:#374151; border-color:#d1d5db; }
-  .client-chip:not(.selected):hover { border-color:#93c5fd; background:#eff6ff; }
+  .client-chip:not(.selected):hover { border-color:var(--cen-green); background:#f8ffe0; }
+
+  /* Primary CEN button */
+  .btn-cen { background:var(--cen-green); color:white; font-weight:600; transition:all .15s; }
+  .btn-cen:hover { background:#88c200; }
+  .btn-cen:disabled { opacity:.4; cursor:not-allowed; }
+
+  /* Focus rings — all inputs use CEN green */
+  input:focus, select:focus, textarea:focus {
+    outline:none !important;
+    border-color:var(--cen-green) !important;
+    box-shadow:0 0 0 2px rgba(151,215,0,.25) !important;
+  }
+
   #modal-overlay { backdrop-filter:blur(2px); }
+
+  /* Upload drop zones */
+  .upload-zone { border:2px dashed #d1d5db; transition:all .15s; }
+  .upload-zone:hover { border-color:var(--cen-green); background:#f8ffe0; }
+
+  /* Step circle */
+  .step-circle { background:var(--cen-black); color:white; }
+
+  /* Section heading accent */
+  .cen-heading-accent { border-bottom:3px solid var(--cen-green); padding-bottom:.4rem; }
+
+  /* Status badges — CEN-branded */
+  .badge-ok       { background:#eafbaa; color:#3e6200; }
+  .badge-missing  { background:#fde8e8; color:#9b1c1c; }
+  .badge-wrong    { background:#fff0e0; color:#954000; }
+  .badge-manual   { background:#e6e8ea; color:var(--cen-black); }
+  .badge-sub      { background:var(--cen-black); color:white; }
+  .badge-claimed  { background:#d8e8e8; color:#1a3a3a; }
+  .badge-discard  { background:#f0f0f0; color:var(--cen-gray-light); }
 </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
+<body class="min-h-screen">
 
 <!-- MODAL — Asignación manual -->
 <div id="modal-overlay" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
@@ -39,61 +88,70 @@
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Modelo (SKU)</label>
           <input id="m-model" type="text" placeholder="Ej: C9300-48P-A"
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
         </div>
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Número de Contrato</label>
           <input id="m-contract" type="text" placeholder="Ej: 207127043"
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
         </div>
       </div>
       <div>
         <label class="block text-xs font-medium text-gray-600 mb-1">Descripción</label>
         <input id="m-desc" type="text" placeholder="Descripción del equipo"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Inicio SmartNet</label>
-          <input id="m-start" type="date" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input id="m-start" type="date" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
         </div>
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Fin SmartNet</label>
-          <input id="m-end" type="date" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input id="m-end" type="date" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
         </div>
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Nivel de Servicio</label>
           <input id="m-level" type="text" placeholder="Ej: L1NBD, SIG 24X7X4"
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
         </div>
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Nombre del cliente</label>
-          <input id="m-client" type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input id="m-client" type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
         </div>
       </div>
       <div>
         <label class="block text-xs font-medium text-gray-600 mb-1">Dirección / Ubicación</label>
         <input id="m-addr" type="text" placeholder="Calle, Ciudad, País, CP"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
       </div>
     </div>
     <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
-      <button onclick="closeModal()" class="border border-gray-300 hover:bg-gray-50 px-5 py-2 rounded-lg text-sm font-medium transition-colors">Cancelar</button>
-      <button onclick="saveManualRow()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">Guardar y aplicar</button>
+      <button onclick="closeModal()" class="px-5 py-2 rounded-lg text-sm font-medium transition-colors" style="border:1px solid var(--cen-gray-light);color:var(--cen-gray-dark)">Cancelar</button>
+      <button onclick="saveManualRow()" class="btn-cen px-6 py-2 rounded-lg text-sm shadow-sm">Guardar y aplicar</button>
     </div>
   </div>
 </div>
 
 <!-- HEADER -->
-<header class="bg-blue-700 text-white px-8 py-4 shadow-lg">
+<header style="background:var(--cen-black)" class="text-white px-8 py-4 shadow-lg">
   <div class="max-w-7xl mx-auto flex items-center justify-between">
     <div>
-      <h1 class="text-xl font-bold tracking-wide">CEN Systems — SmartNet Cisco Tool</h1>
-      <p class="text-blue-200 text-sm mt-0.5">Procesamiento Proactivanet · v4.0 Web</p>
+      <div class="flex items-center gap-3">
+        <!-- Censys logotype -->
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="16" fill="#97D700"/>
+          <circle cx="16" cy="16" r="5" fill="#101820"/>
+        </svg>
+        <div>
+          <h1 class="text-xl font-bold tracking-wide" style="font-family:'Avenir','Open Sans',sans-serif">CEN Systems — SmartNet Cisco Tool</h1>
+          <p class="text-xs mt-0.5" style="color:var(--cen-gray-light)">Procesamiento Proactivanet · v4.0 Web · <em>Thinking ideas… connecting solutions</em></p>
+        </div>
+      </div>
     </div>
-    <div id="header-counts" class="text-blue-200 text-xs text-right leading-relaxed"></div>
+    <div id="header-counts" class="text-xs text-right leading-relaxed" style="color:var(--cen-gray-light)"></div>
   </div>
 </header>
 
@@ -113,14 +171,14 @@
   <div id="tab-guide" class="tab-content">
     <div class="max-w-3xl mx-auto">
 
-      <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-6">
+      <div class="rounded-2xl p-6 mb-6" style="background:var(--cen-black);border-left:4px solid var(--cen-green)">
         <div class="flex items-start gap-4">
           <span class="text-4xl">🌐</span>
           <div>
-            <h2 class="text-base font-bold text-blue-900 mb-1">Descarga desde Cisco CCW-R</h2>
-            <p class="text-sm text-blue-700">Inicia sesión con tu CCO ID y descarga los archivos Excel. Luego súbelos en el paso ②.</p>
+            <h2 class="text-base font-bold text-white mb-1">Descarga desde Cisco CCW-R</h2>
+            <p class="text-sm mb-3" style="color:var(--cen-gray-light)">Inicia sesión con tu CCO ID y descarga los archivos Excel. Luego súbelos en el paso ②.</p>
             <a href="https://ccrc.cisco.com/ccwr/" target="_blank"
-              class="inline-block mt-3 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm">
+              class="btn-cen inline-block px-5 py-2 rounded-lg text-sm shadow-sm">
               Abrir Cisco CCW-R →
             </a>
           </div>
@@ -132,7 +190,7 @@
 
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
           <div class="flex items-start gap-4">
-            <span class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
+            <span class="step-circle flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">1</span>
             <div>
               <h3 class="text-sm font-semibold text-gray-800 mb-1">Inicia sesión en CCW-R</h3>
               <p class="text-xs text-gray-500">Usa tu CCO ID y completa el MFA. Haz clic en el botón de arriba para abrir el portal.</p>
@@ -142,7 +200,7 @@
 
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
           <div class="flex items-start gap-4">
-            <span class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
+            <span class="step-circle flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">2</span>
             <div>
               <h3 class="text-sm font-semibold text-gray-800 mb-2">Descarga por Número de serie (SmartNet)</h3>
               <ol class="text-xs text-gray-500 space-y-1 list-decimal list-inside">
@@ -158,7 +216,7 @@
 
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
           <div class="flex items-start gap-4">
-            <span class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
+            <span class="step-circle flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">3</span>
             <div>
               <h3 class="text-sm font-semibold text-gray-800 mb-2">Descarga por Subscription ID <span class="text-gray-400 font-normal">(si aplica)</span></h3>
               <ol class="text-xs text-gray-500 space-y-1 list-decimal list-inside">
@@ -172,7 +230,7 @@
 
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
           <div class="flex items-start gap-4">
-            <span class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">4</span>
+            <span class="step-circle flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">4</span>
             <div>
               <h3 class="text-sm font-semibold text-gray-800 mb-1">Continúa al paso ②</h3>
               <p class="text-xs text-gray-500">Una vez que tengas los archivos .xlsx descargados, ve a <strong class="text-gray-700">② Cargar Archivos</strong> y súbelos.</p>
@@ -183,8 +241,7 @@
       </div>
 
       <div class="mt-6 flex justify-end">
-        <button onclick="goToTab('files')"
-          class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors shadow-sm text-sm">
+        <button onclick="goToTab('files')" class="btn-cen px-8 py-3 rounded-lg text-sm shadow-sm">
           Ya tengo los archivos → Ir a Cargar Archivos
         </button>
       </div>
@@ -202,9 +259,9 @@
             <h2 class="text-base font-semibold text-gray-800">BD SmartNet de Cisco</h2>
             <p class="text-xs text-gray-400 mt-0.5">ccrc.cisco.com → "BD para Inventario"</p>
           </div>
-          <span id="sn-badge" class="hidden text-xs bg-green-100 text-green-700 font-semibold px-2 py-1 rounded-full">✓ Cargado</span>
+          <span id="sn-badge" class="hidden text-xs font-semibold px-2 py-1 rounded-full badge-ok">✓ Cargado</span>
         </div>
-        <label class="block w-full cursor-pointer border-2 border-dashed border-gray-200 hover:border-blue-400 hover:bg-blue-50 rounded-lg p-4 text-center transition-colors">
+        <label class="upload-zone block w-full cursor-pointer rounded-lg p-4 text-center">
           <span class="text-sm text-gray-500">Haz clic o arrastra el archivo .xlsx</span>
           <input type="file" id="file-smartnet" accept=".xlsx,.xls" onchange="loadCiscoFile('smartnet',event)" class="hidden">
         </label>
@@ -217,9 +274,9 @@
             <h2 class="text-base font-semibold text-gray-800">BD Suscripciones de Cisco</h2>
             <p class="text-xs text-gray-400 mt-0.5">ccrc.cisco.com → "BD SUSCRIPCIONES"</p>
           </div>
-          <span id="sub-badge" class="hidden text-xs bg-green-100 text-green-700 font-semibold px-2 py-1 rounded-full">✓ Cargado</span>
+          <span id="sub-badge" class="hidden text-xs font-semibold px-2 py-1 rounded-full badge-ok">✓ Cargado</span>
         </div>
-        <label class="block w-full cursor-pointer border-2 border-dashed border-gray-200 hover:border-blue-400 hover:bg-blue-50 rounded-lg p-4 text-center transition-colors">
+        <label class="upload-zone block w-full cursor-pointer rounded-lg p-4 text-center">
           <span class="text-sm text-gray-500">Haz clic o arrastra el archivo .xlsx</span>
           <input type="file" id="file-subs" accept=".xlsx,.xls" onchange="loadCiscoFile('subs',event)" class="hidden">
         </label>
@@ -238,26 +295,25 @@
       </div>
     </div>
 
-    <div id="clients-panel" class="hidden bg-white rounded-xl shadow-sm border border-blue-200 p-6 mb-6">
+    <div id="clients-panel" class="hidden bg-white rounded-xl shadow-sm p-6 mb-6" style="border:1px solid var(--cen-green)">
       <div class="flex items-center justify-between mb-3">
         <div>
-          <h2 class="text-base font-semibold text-gray-800">Clientes encontrados en la base de Cisco</h2>
-          <p class="text-sm text-gray-500 mt-0.5">Selecciona los nombres que corresponden a <strong>tu cliente</strong>.</p>
+          <h2 class="text-base font-semibold" style="color:var(--cen-black)">Clientes encontrados en la base de Cisco</h2>
+          <p class="text-sm mt-0.5" style="color:var(--cen-gray-dark)">Selecciona los nombres que corresponden a <strong>tu cliente</strong>.</p>
         </div>
         <div class="text-right">
-          <div id="selected-count" class="text-sm font-semibold text-blue-700"></div>
-          <button onclick="clearSelection()" class="text-xs text-gray-400 hover:text-gray-600 mt-1 block">Limpiar</button>
+          <div id="selected-count" class="text-sm font-semibold" style="color:var(--cen-green)"></div>
+          <button onclick="clearSelection()" class="text-xs mt-1 block" style="color:var(--cen-gray-light)">Limpiar</button>
         </div>
       </div>
       <input type="text" id="client-search" placeholder="Buscar cliente..."
         oninput="renderClientList()"
-        class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full max-w-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3">
+        class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full max-w-sm mb-3">
       <div id="clients-list" class="flex flex-wrap gap-2 max-h-64 overflow-y-auto"></div>
     </div>
 
     <div class="flex justify-end">
-      <button onclick="validateAndGoConfig()"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-lg font-medium transition-colors shadow-sm">
+      <button onclick="validateAndGoConfig()" class="btn-cen px-8 py-2.5 rounded-lg shadow-sm">
         Siguiente → Configurar Proyecto
       </button>
     </div>
@@ -267,68 +323,71 @@
        TAB 2 — CONFIGURAR PROYECTO
   ══════════════════════════════════════════════ -->
   <div id="tab-config" class="tab-content hidden">
-    <div id="config-client-summary" class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-      <p class="text-sm font-medium text-blue-800 mb-2">Nombres en Cisco que corresponden a tu cliente:</p>
+    <div id="config-client-summary" class="rounded-xl p-4 mb-6" style="background:var(--cen-bg-soft);border-left:4px solid var(--cen-green)">
+      <p class="text-sm font-semibold mb-2" style="color:var(--cen-black)">Nombres en Cisco que corresponden a tu cliente:</p>
       <div id="config-client-chips" class="flex flex-wrap gap-2 mb-3"></div>
       <div>
-        <label class="block text-sm font-medium text-blue-800 mb-1">Nombre oficial del cliente <span class="text-blue-500 font-normal ml-1">(como debe quedar en el inventario)</span></label>
+        <label class="block text-sm font-semibold mb-1" style="color:var(--cen-black)">
+          Nombre oficial del cliente
+          <span class="font-normal ml-1" style="color:var(--cen-gray-dark)">(como debe quedar en el inventario)</span>
+        </label>
         <input type="text" id="input-client-oficial"
           placeholder="Ej: Tribunal Electoral del Poder Judicial de la Federación"
-          class="w-full border border-blue-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white">
       </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 class="text-base font-semibold text-gray-800 mb-4 pb-2 border-b">Datos del Proyecto</h2>
+        <h2 class="text-base font-semibold mb-4 pb-2 border-b-2" style="color:var(--cen-black);border-bottom-color:var(--cen-green)">Datos del Proyecto</h2>
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Número de PRY</label>
             <input type="text" id="input-pry" placeholder="Ej: PRY-260520-00001"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">SC</label>
             <input type="text" id="input-sc" placeholder="Ej: SC-260520-002675"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del proyecto <span class="text-gray-400 font-normal">(para la carta)</span></label>
             <input type="text" id="input-nombre-proyecto" placeholder="Ej: Servicios de Mantenimiento Especializados para el CIAS"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
           </div>
         </div>
       </div>
 
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 class="text-base font-semibold text-gray-800 mb-4 pb-2 border-b">Destinatario de la Carta</h2>
+        <h2 class="text-base font-semibold mb-4 pb-2 border-b-2" style="color:var(--cen-black);border-bottom-color:var(--cen-green)">Destinatario de la Carta</h2>
         <div class="space-y-4 mb-6">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del contacto <span class="text-red-500">*</span></label>
             <input type="text" id="input-nombre-contacto" placeholder="Ej: Lic. Juan Pérez García"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Puesto <span class="text-red-500">*</span></label>
             <input type="text" id="input-puesto" placeholder="Ej: Director de Tecnologías de la Información"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
           </div>
         </div>
-        <h2 class="text-base font-semibold text-gray-800 mb-4 pb-2 border-b">Soporte CEN</h2>
+        <h2 class="text-base font-semibold mb-4 pb-2 border-b-2" style="color:var(--cen-black);border-bottom-color:var(--cen-green)">Soporte CEN</h2>
         <div class="space-y-4">
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Inicio CEN Support</label>
-              <input type="date" id="input-inicio-cen" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <input type="date" id="input-inicio-cen" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Fin CEN Support</label>
-              <input type="date" id="input-fin-cen" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <input type="date" id="input-fin-cen" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
             </div>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Tipo CEN Support</label>
-            <select id="input-tipo-cen" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+            <select id="input-tipo-cen" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none bg-white">
               <option value="">— Seleccionar —</option>
               <option value="CEN-SUP-GLD">CEN-SUP-GLD</option>
               <option value="CEN-SUP-SLV">CEN-SUP-SLV</option>
@@ -346,17 +405,17 @@
       <textarea id="input-serials" rows="8"
         placeholder="FOC2147Z0DB&#10;FCH22137WBS&#10;..."
         oninput="updateSerialsCount()"
-        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
+        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none resize-y"></textarea>
       <div class="mt-2 flex flex-wrap items-center gap-3">
         <span class="text-sm text-gray-500">O sube un archivo:</span>
         <input type="file" id="file-serials" accept=".txt,.xlsx,.xls,.csv" onchange="loadSerialsFile(event)" class="text-sm text-gray-500">
-        <span id="serials-count" class="text-sm font-semibold text-blue-700 ml-auto"></span>
+        <span id="serials-count" class="text-sm font-semibold ml-auto" style="color:var(--cen-green)"></span>
       </div>
     </div>
 
     <div class="flex justify-between">
-      <button onclick="goToTab('files')" class="border border-gray-300 hover:bg-gray-50 px-8 py-2.5 rounded-lg text-sm font-medium transition-colors">← Volver</button>
-      <button onclick="processData()" class="bg-green-600 hover:bg-green-700 text-white px-10 py-2.5 rounded-lg font-medium transition-colors shadow-sm">Procesar y Validar →</button>
+      <button onclick="goToTab('files')" class="px-8 py-2.5 rounded-lg text-sm font-medium transition-colors" style="border:1px solid var(--cen-gray-light);color:var(--cen-gray-dark)">← Volver</button>
+      <button onclick="processData()" class="btn-cen px-10 py-2.5 rounded-lg shadow-sm">Procesar y Validar →</button>
     </div>
   </div>
 
@@ -366,30 +425,31 @@
   <div id="tab-results" class="tab-content hidden">
     <div class="flex justify-end gap-3 mb-4">
       <button id="btn-export-carta" onclick="exportCarta()" disabled
-        class="bg-green-600 hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg font-semibold transition-colors text-sm shadow-sm">
+        class="btn-cen disabled:opacity-40 disabled:cursor-not-allowed px-6 py-2.5 rounded-lg text-sm shadow-sm">
         📄 Generar Carta de Activación
       </button>
       <button id="btn-export-inv" onclick="exportExcel()" disabled
-        class="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg font-semibold transition-colors text-sm shadow-sm">
+        class="btn-cen disabled:opacity-40 disabled:cursor-not-allowed px-6 py-2.5 rounded-lg text-sm shadow-sm"
+        style="background:var(--cen-black)">
         ⬇ Exportar INVENTARIO + VALIDACION
       </button>
     </div>
     <div id="coverage-alert" class="hidden rounded-xl p-4 mb-5 border text-sm"></div>
-    <div id="complement-panel" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-5 mb-5">
+    <div id="complement-panel" class="hidden rounded-xl p-5 mb-5" style="background:#fff8ef;border:1px solid #f5a343">
       <div class="flex items-start gap-3 mb-4">
         <span class="text-2xl">📥</span>
         <div>
-          <h3 class="text-sm font-semibold text-amber-900">Cargar archivo complementario de Cisco</h3>
-          <p class="text-xs text-amber-700 mt-0.5">Descarga de Cisco el archivo con las series faltantes y súbelo aquí.</p>
+          <h3 class="text-sm font-semibold" style="color:#7a3500">Cargar archivo complementario de Cisco</h3>
+          <p class="text-xs mt-0.5" style="color:var(--cen-orange-warn)">Descarga de Cisco el archivo con las series faltantes y súbelo aquí.</p>
         </div>
       </div>
       <div class="flex flex-wrap gap-4">
-        <label class="flex-1 min-w-48 cursor-pointer bg-white border border-amber-300 hover:border-amber-500 rounded-lg p-3 text-center transition-colors">
-          <p class="text-xs font-medium text-amber-800 mb-1">SmartNet adicional</p>
+        <label class="flex-1 min-w-48 cursor-pointer bg-white rounded-lg p-3 text-center transition-colors" style="border:1px solid #f5a343" onmouseenter="this.style.borderColor='var(--cen-orange-warn)'" onmouseleave="this.style.borderColor='#f5a343'">
+          <p class="text-xs font-medium mb-1" style="color:#7a3500">SmartNet adicional</p>
           <input type="file" accept=".xlsx,.xls" onchange="loadComplementary('smartnet',event)" class="hidden">
         </label>
-        <label class="flex-1 min-w-48 cursor-pointer bg-white border border-amber-300 hover:border-amber-500 rounded-lg p-3 text-center transition-colors">
-          <p class="text-xs font-medium text-amber-800 mb-1">Suscripciones adicional</p>
+        <label class="flex-1 min-w-48 cursor-pointer bg-white rounded-lg p-3 text-center transition-colors" style="border:1px solid #f5a343" onmouseenter="this.style.borderColor='var(--cen-orange-warn)'" onmouseleave="this.style.borderColor='#f5a343'">
+          <p class="text-xs font-medium mb-1" style="color:#7a3500">Suscripciones adicional</p>
           <input type="file" accept=".xlsx,.xls" onchange="loadComplementary('subs',event)" class="hidden">
         </label>
       </div>
@@ -402,25 +462,25 @@
       </div>
       <input type="text" id="results-search" placeholder="Buscar serial, modelo..."
         oninput="renderTable()"
-        class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-56 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-56 focus:outline-none">
     </div>
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-5">
       <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
-          <thead class="bg-gray-50 border-b border-gray-200">
+          <thead class="border-b-2" style="background:var(--cen-black)">
             <tr>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Estado</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Tipo</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Serial</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Modelo</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Descripción</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Cliente en Cisco</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Contrato</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Nivel</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Inicio SN</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Fin SN</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Ubicación</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Acción</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color:var(--cen-gray-light)">Estado</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color:var(--cen-gray-light)">Tipo</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color:var(--cen-gray-light)">Serial</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color:var(--cen-gray-light)">Modelo</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color:var(--cen-gray-light)">Descripción</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color:var(--cen-gray-light)">Cliente en Cisco</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color:var(--cen-gray-light)">Contrato</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color:var(--cen-gray-light)">Nivel</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color:var(--cen-gray-light)">Inicio SN</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color:var(--cen-gray-light)">Fin SN</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color:var(--cen-gray-light)">Ubicación</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color:var(--cen-gray-light)">Acción</th>
             </tr>
           </thead>
           <tbody id="results-tbody">
@@ -430,11 +490,29 @@
       </div>
     </div>
     <div class="flex justify-between">
-      <button onclick="goToTab('config')" class="border border-gray-300 hover:bg-gray-50 px-8 py-2.5 rounded-lg text-sm font-medium transition-colors">← Volver</button>
+      <button onclick="goToTab('config')" class="px-8 py-2.5 rounded-lg text-sm font-medium transition-colors" style="border:1px solid var(--cen-gray-light);color:var(--cen-gray-dark)">← Volver</button>
     </div>
   </div>
 
 </main>
+
+<!-- FOOTER CORPORATIVO -->
+<footer class="mt-8 border-t border-gray-200 py-5 px-8" style="background:#fff">
+  <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-2.5">
+      <svg width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="16" fill="#97D700"/>
+        <circle cx="16" cy="16" r="5" fill="#101820"/>
+      </svg>
+      <span class="text-xs font-semibold" style="color:var(--cen-gray-dark)">CEN Systems S.A. de C.V.</span>
+      <span class="text-xs" style="color:var(--cen-gray-light)">|</span>
+      <span class="text-xs" style="color:var(--cen-gray-light)">Cisco Gold Partner</span>
+    </div>
+    <p class="text-xs leading-relaxed" style="color:var(--cen-gray-light);max-width:520px">
+      Este documento es propiedad de CEN Systems S.A. de C.V., queda prohibido cualquier uso o reproducción total o parcial para fines no autorizados.
+    </p>
+  </div>
+</footer>
 
 <script>
 // ─── STATE ────────────────────────────────────────────────
@@ -522,7 +600,7 @@ function loadCiscoFile(type, ev) {
 function loadComplementary(type, ev) {
   const file = ev.target.files[0]; if(!file) return;
   const statusEl = document.getElementById('complement-status');
-  statusEl.textContent='Cargando archivo complementario...'; statusEl.className='text-xs text-amber-700';
+  statusEl.textContent='Cargando archivo complementario...'; statusEl.className='text-xs'; statusEl.style.color='var(--cen-orange-warn)';
   readWB(file,(err,wb)=>{
     if(err){ statusEl.textContent='✗ Error al leer el archivo'; statusEl.className='text-xs text-red-600'; return; }
     const newRows = parseCiscoWB(wb);
@@ -621,14 +699,15 @@ function updateSelectedCount() {
   const n=S.selectedClients.size;
   const el=document.getElementById('selected-count');
   el.textContent=n===0?'Ninguno seleccionado':`${n} nombre(s) seleccionado(s)`;
-  el.className=n>0?'text-sm font-semibold text-blue-700':'text-sm text-gray-400';
+  el.style.color=n>0?'var(--cen-green)':'var(--cen-gray-light)';
+  el.className='text-sm font-semibold';
 }
 
 function syncConfigClientSummary() {
   const chips=document.getElementById('config-client-chips'); if(!chips) return;
   chips.innerHTML=S.selectedClients.size===0
     ?'<span class="text-sm text-gray-400 italic">Ninguno — regresa al paso anterior</span>'
-    :[...S.selectedClients].map(n=>`<span class="bg-blue-600 text-white text-xs font-medium px-3 py-1 rounded-full">${esc(n)}</span>`).join('');
+    :[...S.selectedClients].map(n=>`<span class="text-xs font-medium px-3 py-1 rounded-full text-white" style="background:var(--cen-black)">${esc(n)}</span>`).join('');
 }
 
 function validateAndGoConfig() {
@@ -771,13 +850,13 @@ function removeManual(serial)  { S.manualRows.delete(serial);     processData(tr
 
 // ─── RENDER ───────────────────────────────────────────────
 const STAT={
-  ok:{label:'OK',cls:'bg-green-100 text-green-800'},
-  missing:{label:'No encontrado',cls:'bg-red-100 text-red-800'},
-  'wrong-client':{label:'Cliente incorrecto',cls:'bg-orange-100 text-orange-800'},
-  claimed:{label:'Reclamado',cls:'bg-teal-100 text-teal-800'},
-  manual:{label:'Manual',cls:'bg-blue-100 text-blue-800'},
-  subscription:{label:'Suscripción',cls:'bg-purple-100 text-purple-800'},
-  discarded:{label:'Descartado',cls:'bg-gray-100 text-gray-400'},
+  ok:            {label:'OK',              cls:'badge-ok'},
+  missing:       {label:'No encontrado',   cls:'badge-missing'},
+  'wrong-client':{label:'Cliente incorrecto',cls:'badge-wrong'},
+  claimed:       {label:'Reclamado',       cls:'badge-claimed'},
+  manual:        {label:'Manual',          cls:'badge-manual'},
+  subscription:  {label:'Suscripción',     cls:'badge-sub'},
+  discarded:     {label:'Descartado',      cls:'badge-discard'},
 };
 
 function renderResults() {
@@ -792,23 +871,23 @@ function renderResults() {
     const parts=[];
     if(counts.missing>0) parts.push(`<strong>${counts.missing}</strong> no encontrada(s)`);
     if(counts['wrong-client']>0) parts.push(`<strong>${counts['wrong-client']}</strong> en otro cliente`);
-    alertEl.className='rounded-xl p-4 mb-5 border border-orange-200 bg-orange-50 text-orange-800 text-sm';
+    alertEl.className='rounded-xl p-4 mb-5 border text-sm'; alertEl.style.cssText='border-color:#f5a343;background:#fff8ef;color:#7a3500';
     alertEl.innerHTML=`⚠ <strong>Cobertura incompleta:</strong> De ${serialList.length} series — ${parts.join(' · ')}.`;
     document.getElementById('complement-panel').classList.remove('hidden');
   } else {
-    alertEl.className='rounded-xl p-4 mb-5 border border-green-200 bg-green-50 text-green-800 text-sm';
+    alertEl.className='rounded-xl p-4 mb-5 border text-sm'; alertEl.style.cssText='border-color:#7bac00;background:#f0fbe0;color:#3e6200';
     alertEl.innerHTML=`✓ <strong>Cobertura completa:</strong> Las ${serialList.length} series están localizadas.`;
     document.getElementById('complement-panel').classList.add('hidden');
   }
   alertEl.classList.remove('hidden');
 
   document.getElementById('results-summary').innerHTML=[
-    {label:`OK (${counts.ok} de ${serialList.length})`,value:counts.ok,cls:'text-green-600',bg:'border-green-200'},
+    {label:`OK (${counts.ok} de ${serialList.length})`,value:counts.ok,cls:'',bg:'border-gray-200',style:'color:var(--cen-green)'},
     {label:'No encontradas',value:counts.missing,cls:'text-red-600',bg:'border-red-200'},
-    {label:'Cliente incorrecto',value:counts['wrong-client']||0,cls:'text-orange-600',bg:'border-orange-200'},
-    {label:'Suscripciones',value:counts.subscription,cls:'text-purple-600',bg:'border-purple-200'},
-    {label:'Total resultados',value:S.allItems.length,cls:'text-blue-600',bg:'border-blue-200'},
-  ].map(s=>`<div class="bg-white rounded-xl shadow-sm border ${s.bg} p-4 text-center"><div class="text-3xl font-bold ${s.cls}">${s.value}</div><div class="text-xs text-gray-500 mt-1 font-medium leading-tight">${s.label}</div></div>`).join('');
+    {label:'Cliente incorrecto',value:counts['wrong-client']||0,cls:'',bg:'border-gray-200',style:'color:var(--cen-orange-warn)'},
+    {label:'Suscripciones',value:counts.subscription,cls:'',bg:'border-gray-200',style:'color:var(--cen-gray-dark)'},
+    {label:'Total resultados',value:S.allItems.length,cls:'',bg:'border-gray-200',style:'color:var(--cen-green)'},
+  ].map(s=>`<div class="bg-white rounded-xl shadow-sm border ${s.bg} p-4 text-center"><div class="text-3xl font-bold ${s.cls}" ${s.style?`style="${s.style}"`:''}>${s.value}</div><div class="text-xs mt-1 font-medium leading-tight" style="color:var(--cen-gray-dark)">${s.label}</div></div>`).join('');
 
   S.activeFilter='all';
   document.getElementById('filter-buttons').innerHTML=[
@@ -856,18 +935,18 @@ function renderTable() {
     const typeLabel=item.source==='subscription'?'SUSCRIPCIÓN':(item.status==='missing'||item.status==='discarded')?'—':item.source==='manual'?'MANUAL':'CHASSIS';
     let extra='';
     if(item.alsoIn&&item.alsoIn.length>0) extra=`<div class="text-xs text-yellow-600 mt-1">⚠ También en: ${esc(item.alsoIn.join(', '))}</div>`;
-    if(item.wrongClients) extra=`<div class="text-xs text-orange-500 mt-1">${esc(item.wrongClients.join(' / '))}</div>`;
-    if(item.claimedFrom) extra=`<div class="text-xs text-teal-600 mt-1">Reclamado desde: ${esc(item.claimedFrom.join(', '))}</div>`;
+    if(item.wrongClients) extra=`<div class="text-xs mt-1" style="color:var(--cen-orange-warn)">${esc(item.wrongClients.join(' / '))}</div>`;
+    if(item.claimedFrom) extra=`<div class="text-xs mt-1" style="color:var(--cen-gray-dark)">Reclamado desde: ${esc(item.claimedFrom.join(', '))}</div>`;
     let action='';
     if(item.status==='discarded'){
       action=`<button data-idx="${idx}" data-action="restore-discard" class="text-xs border border-gray-300 hover:bg-gray-50 text-gray-600 px-2.5 py-1 rounded-md font-medium whitespace-nowrap">Restaurar</button>`;
     } else if(item.status==='missing'&&item.source!=='manual'){
       action=`<div class="flex flex-col gap-1">
-        <button data-idx="${idx}" data-action="open-modal" class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-md font-medium whitespace-nowrap">Agregar manualmente</button>
+        <button data-idx="${idx}" data-action="open-modal" class="text-xs text-white px-2.5 py-1 rounded-md font-medium whitespace-nowrap" style="background:var(--cen-black)">Agregar manualmente</button>
         <button data-idx="${idx}" data-action="discard" class="text-xs text-red-400 hover:text-red-600 px-2.5 py-1 font-medium whitespace-nowrap">Descartar</button></div>`;
     } else if(item.status==='wrong-client'){
       action=`<div class="flex flex-col gap-1">
-        <button data-idx="${idx}" data-action="claim" class="text-xs bg-teal-600 hover:bg-teal-700 text-white px-2.5 py-1 rounded-md font-medium whitespace-nowrap">Es mi cliente ✓</button>
+        <button data-idx="${idx}" data-action="claim" class="text-xs text-white px-2.5 py-1 rounded-md font-medium whitespace-nowrap btn-cen">Es mi cliente ✓</button>
         <button data-idx="${idx}" data-action="open-modal" class="text-xs border border-gray-300 hover:bg-gray-50 px-2.5 py-1 rounded-md font-medium whitespace-nowrap">Capturar datos</button>
         <button data-idx="${idx}" data-action="discard" class="text-xs text-red-400 hover:text-red-600 px-2.5 py-1 font-medium whitespace-nowrap">Descartar</button></div>`;
     } else if(item.status==='ok'&&(item.source==='manual'||item.source==='claimed')){
@@ -876,7 +955,7 @@ function renderTable() {
         <button data-idx="${idx}" data-action="open-modal" class="text-xs border border-gray-300 hover:bg-gray-50 px-2.5 py-1 rounded-md font-medium">Editar</button>
         <button data-idx="${idx}" data-action="${removeAct}" class="text-xs text-red-500 hover:text-red-700 px-2.5 py-1 font-medium">Quitar</button></div>`;
     }
-    return `<tr class="border-b border-gray-50 hover:bg-slate-50">
+    return `<tr class="border-b border-gray-100 hover:bg-lime-50">
       <td class="px-4 py-3 align-top whitespace-nowrap"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${st.cls}">${st.label}</span>${extra}</td>
       <td class="px-4 py-3 align-top text-xs text-gray-400 font-medium whitespace-nowrap">${typeLabel}</td>
       <td class="px-4 py-3 align-top font-mono text-xs font-semibold text-gray-800 whitespace-nowrap">${esc(item.serial)}</td>
