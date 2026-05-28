@@ -731,7 +731,7 @@ function clientIsSelected(name) { return S.selectedClients.has((name||'').trim()
 function processData(silent=false) {
   if(S.selectedClients.size===0){ if(!silent) alert('Selecciona el cliente.'); return; }
   const serialList=getSerials();
-  if(serialList.length===0){ if(!silent) alert('Ingresa al menos un número de serie.'); return; }
+  // serialList puede estar vacío — se permite procesar solo con la BD de Cisco
 
   const config={
     pry:          document.getElementById('input-pry').value.trim(),
