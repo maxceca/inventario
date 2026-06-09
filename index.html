@@ -776,8 +776,19 @@ function processData(silent=false) {
 
   S.results={smartnet:smResults,subscriptions:subResults,config};
   buildAllItems();
-  renderResults();
-  if(!silent) goToTab('results');
+
+  if(silent){
+    // Preserva filtro activo y posición de scroll al re-procesar desde la tabla
+    const prevFilter = S.activeFilter;
+    const prevScroll = window.scrollY;
+    renderResults();
+    setFilter(prevFilter);                      // restaura el filtro que tenía el usuario
+    requestAnimationFrame(()=>window.scrollTo(0, prevScroll)); // restaura la posición
+  } else {
+    renderResults();
+    goToTab('results');
+  }
+
   document.getElementById('btn-export-inv').disabled=false;
   document.getElementById('btn-export-carta').disabled=false;
 }
