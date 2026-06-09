@@ -535,11 +535,20 @@ function buildAddress(row) {
           row['End Customer Country/Region'],row['End Customer Zip/Postal Code']]
     .filter(Boolean).join(', ');
 }
+// ISO (YYYY-MM-DD) → DD/MM/AAAA  (para fechas CEN del input date)
 function fmtConfigDate(d) {
   if(!d) return '';
   const [y,m,day]=d.split('-');
-  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return `${day}-${mo[parseInt(m,10)-1]}-${y}`;
+  return `${day}/${m}/${y}`;
+}
+// Cisco (DD-Mon-YYYY) → DD/MM/AAAA  (para fechas de SmartNet y Suscripciones)
+function fmtCiscoDate(d) {
+  if(!d) return '';
+  const mo={Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',
+            Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
+  const m=d.match(/^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/);
+  if(m) return `${m[1].padStart(2,'0')}/${mo[m[2]]||'01'}/${m[3]}`;
+  return d; // formato desconocido: devuelve tal cual
 }
 
 // ─── FILE PARSING ─────────────────────────────────────────
@@ -1007,17 +1016,17 @@ function buildInventarioRows(config) {
     const row=item.row, serial=item.serial;
     const loc=S.locationMap.get(serial)||'';
     const addr=item.source==='manual'?(row['_addr']||''):buildAddress(row);
-    rows.push(makeRow({NAME:serial,Type:'CHASSIS',Model:cleanText(row['Product /Offer Name']),Serial:serial,Status:row['Status']||'ACTIVE','Descripción':cleanText(row['Description']),'Nombre cliente':config.clientOficial||row['End Customer Name']||'','Numero de PRY':config.pry,'No de Contrato Smartnet':row['Subscription ID/Contract Number']||'','Inicio SMARNET':row['Start Date']||'','Fin de SMARNET':row['End Date']||'','Nivel de Servicio':row['Service Level/Offer Type']||'','INICIO DE CEN SUPPORT':fmtConfigDate(config.inicioCen),'FIN DE CEN SUPPORT':fmtConfigDate(config.finCen),'TIPO CEN SUPPORT':config.tipoCen,ASSOCIATEDTO:1,ELEMENT:'GENERAL_CLIENTE',LOCATION:loc,'DIRECCION ENTREGA SMARNET':addr,SC:config.sc,Cantidad:row['Quantity']||1}));
+    rows.push(makeRow({NAME:serial,Type:'CHASSIS',Model:cleanText(row['Product /Offer Name']),Serial:serial,Status:row['Status']||'ACTIVE','Descripción':cleanText(row['Description']),'Nombre cliente':config.clientOficial||row['End Customer Name']||'','Numero de PRY':config.pry,'No de Contrato Smartnet':row['Subscription ID/Contract Number']||'','Inicio SMARNET':fmtCiscoDate(row['Start Date']),'Fin de SMARNET':fmtCiscoDate(row['End Date']),'Nivel de Servicio':row['Service Level/Offer Type']||'','INICIO DE CEN SUPPORT':fmtConfigDate(config.inicioCen),'FIN DE CEN SUPPORT':fmtConfigDate(config.finCen),'TIPO CEN SUPPORT':config.tipoCen,ASSOCIATEDTO:1,ELEMENT:'GENERAL_CLIENTE',LOCATION:loc,'DIRECCION ENTREGA SMARNET':addr,SC:config.sc,Cantidad:row['Quantity']||1}));
     let n=1;
     for(const minor of (item.minors||[])){
       const mSerial=`${serial}_DA${n}`;
-      rows.push(makeRow({NAME:mSerial,Type:'SOFTWARE',Model:cleanText(minor['Product /Offer Name']),Serial:mSerial,Status:minor['Status']||'ACTIVE','Descripción':cleanText(minor['Description']),'Nombre cliente':config.clientOficial||minor['End Customer Name']||'','Numero de PRY':config.pry,'No de Contrato Smartnet':minor['Subscription ID/Contract Number']||'','Inicio SMARNET':minor['Start Date']||'','Fin de SMARNET':minor['End Date']||'','Nivel de Servicio':minor['Service Level/Offer Type']||'','INICIO DE CEN SUPPORT':fmtConfigDate(config.inicioCen),'FIN DE CEN SUPPORT':fmtConfigDate(config.finCen),'TIPO CEN SUPPORT':config.tipoCen,ASSOCIATEDTO:2,ELEMENT:serial,LOCATION:loc,'DIRECCION ENTREGA SMARNET':buildAddress(minor),SC:config.sc,Cantidad:minor['Quantity']||1}));
+      rows.push(makeRow({NAME:mSerial,Type:'SOFTWARE',Model:cleanText(minor['Product /Offer Name']),Serial:mSerial,Status:minor['Status']||'ACTIVE','Descripción':cleanText(minor['Description']),'Nombre cliente':config.clientOficial||minor['End Customer Name']||'','Numero de PRY':config.pry,'No de Contrato Smartnet':minor['Subscription ID/Contract Number']||'','Inicio SMARNET':fmtCiscoDate(minor['Start Date']),'Fin de SMARNET':fmtCiscoDate(minor['End Date']),'Nivel de Servicio':minor['Service Level/Offer Type']||'','INICIO DE CEN SUPPORT':fmtConfigDate(config.inicioCen),'FIN DE CEN SUPPORT':fmtConfigDate(config.finCen),'TIPO CEN SUPPORT':config.tipoCen,ASSOCIATEDTO:2,ELEMENT:serial,LOCATION:loc,'DIRECCION ENTREGA SMARNET':buildAddress(minor),SC:config.sc,Cantidad:minor['Quantity']||1}));
       n++;
     }
   }
   for(const item of subscriptions){
     const row=item.row, contract=row['Subscription ID/Contract Number']||'';
-    rows.push(makeRow({NAME:'',Type:'SOFTWARE',Model:cleanText(row['Product /Offer Name']),Serial:contract,Status:row['Status']||'ACTIVE','Descripción':cleanText(row['Description']),'Nombre cliente':config.clientOficial||row['End Customer Name']||'','Numero de PRY':config.pry,'No de Contrato Smartnet':contract,'Inicio SMARNET':row['Start Date']||'','Fin de SMARNET':row['End Date']||'','Nivel de Servicio':row['Service Level/Offer Type']||'','INICIO DE CEN SUPPORT':fmtConfigDate(config.inicioCen),'FIN DE CEN SUPPORT':fmtConfigDate(config.finCen),'TIPO CEN SUPPORT':config.tipoCen,ASSOCIATEDTO:1,ELEMENT:'GENERAL_CLIENTE',LOCATION:'','DIRECCION ENTREGA SMARNET':buildAddress(row),SC:config.sc,Cantidad:row['Quantity']||1,'Contrato/ID':contract,Inicio:row['Start Date']||'',Fin:row['End Date']||''}));
+    rows.push(makeRow({NAME:'',Type:'SOFTWARE',Model:cleanText(row['Product /Offer Name']),Serial:contract,Status:row['Status']||'ACTIVE','Descripción':cleanText(row['Description']),'Nombre cliente':config.clientOficial||row['End Customer Name']||'','Numero de PRY':config.pry,'No de Contrato Smartnet':contract,'Inicio SMARNET':fmtCiscoDate(row['Start Date']),'Fin de SMARNET':fmtCiscoDate(row['End Date']),'Nivel de Servicio':row['Service Level/Offer Type']||'','INICIO DE CEN SUPPORT':fmtConfigDate(config.inicioCen),'FIN DE CEN SUPPORT':fmtConfigDate(config.finCen),'TIPO CEN SUPPORT':config.tipoCen,ASSOCIATEDTO:1,ELEMENT:'GENERAL_CLIENTE',LOCATION:'','DIRECCION ENTREGA SMARNET':buildAddress(row),SC:config.sc,Cantidad:row['Quantity']||1,'Contrato/ID':contract,Inicio:fmtCiscoDate(row['Start Date']),Fin:fmtCiscoDate(row['End Date'])}));
   }
   return rows;
 }
