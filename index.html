@@ -739,21 +739,8 @@ function clientIsSelected(name) { return S.selectedClients.has((name||'').trim()
 
 function processData(silent=false) {
   if(S.selectedClients.size===0){ if(!silent) alert('Selecciona el cliente.'); return; }
-  let serialList=getSerials();
-
-  // Sin seriales: auto-descubrir todos los PAK/Serial Number presentes en la BD
-  if(serialList.length===0){
-    const auto=new Set();
-    for(const row of S.smartNetRows){
-      const pak=(row['PAK/Serial Number']||'').trim().toUpperCase();
-      if(pak) auto.add(pak);
-    }
-    for(const row of S.subsRows){
-      const id=(row['Subscription ID/Contract Number']||'').trim();
-      if(id) auto.add(id);
-    }
-    serialList=[...auto];
-  }
+  const serialList=getSerials();
+  // serialList puede estar vacío — se permite procesar solo con la BD de Cisco
 
   const config={
     pry:          document.getElementById('input-pry').value.trim(),
