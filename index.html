@@ -1019,10 +1019,7 @@ function buildInventarioRows(config) {
     rows.push(makeRow({NAME:serial,Type:'CHASSIS',Model:cleanText(row['Product /Offer Name']),Serial:serial,Status:row['Status']||'ACTIVE','Descripción':cleanText(row['Description']),'Nombre cliente':config.clientOficial||row['End Customer Name']||'','Numero de PRY':config.pry,'No de Contrato Smartnet':row['Subscription ID/Contract Number']||'','Inicio SMARNET':fmtCiscoDate(row['Start Date']),'Fin de SMARNET':fmtCiscoDate(row['End Date']),'Nivel de Servicio':row['Service Level/Offer Type']||'','INICIO DE CEN SUPPORT':fmtConfigDate(config.inicioCen),'FIN DE CEN SUPPORT':fmtConfigDate(config.finCen),'TIPO CEN SUPPORT':config.tipoCen,ASSOCIATEDTO:1,ELEMENT:'GENERAL_CLIENTE',LOCATION:loc,'DIRECCION ENTREGA SMARNET':addr,SC:config.sc,Cantidad:row['Quantity']||1}));
     let n=1;
     for(const minor of (item.minors||[])){
-      const minorPak=(minor['PAK/Serial Number']||'').trim();
-      if(minorPak) continue; // hardware (cables, PSU, módulos) — tiene serie propia, se omite
-      const mSerial=(minor['Instance Number']||'').trim();
-      if(!mSerial) continue;
+      const mSerial=(minor['Instance Number']||'').trim()||`${serial}_DA${n}`;
       rows.push(makeRow({NAME:mSerial,Type:'SOFTWARE',Model:cleanText(minor['Product /Offer Name']),Serial:mSerial,Status:minor['Status']||'ACTIVE','Descripción':cleanText(minor['Description']),'Nombre cliente':config.clientOficial||minor['End Customer Name']||'','Numero de PRY':config.pry,'No de Contrato Smartnet':minor['Subscription ID/Contract Number']||'','Inicio SMARNET':fmtCiscoDate(minor['Start Date']),'Fin de SMARNET':fmtCiscoDate(minor['End Date']),'Nivel de Servicio':minor['Service Level/Offer Type']||'','INICIO DE CEN SUPPORT':fmtConfigDate(config.inicioCen),'FIN DE CEN SUPPORT':fmtConfigDate(config.finCen),'TIPO CEN SUPPORT':config.tipoCen,ASSOCIATEDTO:2,ELEMENT:serial,LOCATION:loc,'DIRECCION ENTREGA SMARNET':buildAddress(minor),SC:config.sc,Cantidad:minor['Quantity']||1}));
       n++;
     }
