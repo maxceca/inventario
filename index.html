@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.sheetjs.com https://cdn.jsdelivr.net; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://raw.githubusercontent.com; img-src 'self' data:;">
 <title>CEN Systems — SmartNet Cisco Tool</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -321,7 +322,7 @@
        TAB 2 — CONFIGURAR PROYECTO
   ══════════════════════════════════════════════ -->
   <div id="tab-config" class="tab-content hidden">
-    <div id="config-client-summary" class="rounded-xl p-4 mb-6" style="background:var(--cen-bg-soft);border-left:4px solid var(--cen-green)">
+    <div class="rounded-xl p-4 mb-6" style="background:var(--cen-bg-soft);border-left:4px solid var(--cen-green)">
       <p class="text-sm font-semibold mb-2" style="color:var(--cen-black)">Nombres en Cisco que corresponden a tu cliente:</p>
       <div id="config-client-chips" class="flex flex-wrap gap-2 mb-3"></div>
       <div>
@@ -361,12 +362,12 @@
         <h2 class="text-base font-semibold mb-4 pb-2 border-b-2" style="color:var(--cen-black);border-bottom-color:var(--cen-green)">Destinatario de la Carta</h2>
         <div class="space-y-4 mb-6">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del contacto <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del contacto</label>
             <input type="text" id="input-nombre-contacto" placeholder="Ej: Lic. Juan Pérez García"
               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Puesto <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Puesto</label>
             <input type="text" id="input-puesto" placeholder="Ej: Director de Tecnologías de la Información"
               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
           </div>
@@ -421,16 +422,23 @@
        TAB 3 — RESULTADOS
   ══════════════════════════════════════════════ -->
   <div id="tab-results" class="tab-content hidden">
-    <div class="flex justify-end gap-3 mb-4">
-      <button id="btn-export-carta" onclick="exportCarta()" disabled
-        class="btn-cen disabled:opacity-40 disabled:cursor-not-allowed px-6 py-2.5 rounded-lg text-sm shadow-sm">
-        📄 Generar Carta de Activación
+    <div class="flex justify-between items-center gap-3 mb-4">
+      <button onclick="resetAll()"
+        class="px-5 py-2.5 rounded-lg text-sm font-medium transition-colors"
+        style="border:1px solid var(--cen-gray-light);color:var(--cen-gray-dark)">
+        🔄 Nuevo Inventario
       </button>
-      <button id="btn-export-inv" onclick="exportExcel()" disabled
-        class="btn-cen disabled:opacity-40 disabled:cursor-not-allowed px-6 py-2.5 rounded-lg text-sm shadow-sm"
-        style="background:var(--cen-black)">
-        ⬇ Exportar INVENTARIO + VALIDACION
-      </button>
+      <div class="flex gap-3">
+        <button id="btn-export-carta" onclick="exportCarta()" disabled
+          class="btn-cen disabled:opacity-40 disabled:cursor-not-allowed px-6 py-2.5 rounded-lg text-sm shadow-sm">
+          📄 Generar Carta de Activación
+        </button>
+        <button id="btn-export-inv" onclick="exportExcel()" disabled
+          class="btn-cen disabled:opacity-40 disabled:cursor-not-allowed px-6 py-2.5 rounded-lg text-sm shadow-sm"
+          style="background:var(--cen-black)">
+          ⬇ Exportar INVENTARIO + VALIDACION
+        </button>
+      </div>
     </div>
     <div id="coverage-alert" class="hidden rounded-xl p-4 mb-5 border text-sm"></div>
     <div id="complement-panel" class="hidden rounded-xl p-5 mb-5" style="background:#fff8ef;border:1px solid #f5a343">
@@ -517,6 +525,39 @@ const S = {
   claimedSerials: new Set(), discardedSerials: new Set(),
   manualRows: new Map(), pendingManual: null,
 };
+
+// ─── RESET ────────────────────────────────────────────────
+function resetAll() {
+  if (!confirm('¿Borrar todo y comenzar un inventario nuevo?')) return;
+  S.smartNetRows = []; S.subsRows = []; S.locationMap = new Map();
+  S.allClientNames = []; S.selectedClients = new Set();
+  S.results = null; S.allItems = []; S.activeFilter = 'all';
+  S.claimedSerials = new Set(); S.discardedSerials = new Set();
+  S.manualRows = new Map(); S.pendingManual = null;
+  ['file-smartnet','file-subs','file-serials','file-location'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  ['input-pry','input-client-oficial','input-nombre-contacto','input-puesto',
+   'input-sc','input-inicio-cen','input-fin-cen','input-serials',
+   'input-nombre-proyecto','client-search'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  const tipoCen = document.getElementById('input-tipo-cen');
+  if (tipoCen) tipoCen.value = '';
+  document.getElementById('results-tbody').innerHTML =
+    '<tr><td colspan="12" class="px-4 py-12 text-center text-gray-400">Procesa los archivos para ver los resultados</td></tr>';
+  ['btn-export-carta','btn-export-inv'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.disabled = true;
+  });
+  document.getElementById('coverage-alert').classList.add('hidden');
+  document.getElementById('complement-panel').classList.add('hidden');
+  const locStatus = document.getElementById('location-status');
+  if (locStatus) { locStatus.textContent = ''; locStatus.className = 'text-xs text-gray-400 whitespace-nowrap'; }
+  ['sn-badge','sub-badge'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.classList.add('hidden');
+  });
+  goToTab('files');
+}
 
 // ─── TABS ─────────────────────────────────────────────────
 function goToTab(name) {
@@ -627,7 +668,7 @@ function loadComplementary(type, ev) {
 function loadLocationFile(ev) {
   const file=ev.target.files[0]; if(!file) return;
   readWB(file,(err,wb)=>{
-    if(err) return;
+    if(err){ document.getElementById('location-status').textContent='✗ Error al leer el archivo'; return; }
     const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',raw:false});
     S.locationMap.clear();
     rows.forEach((row,i)=>{
@@ -650,7 +691,7 @@ function loadSerialsFile(ev) {
     r.readAsText(file);
   } else {
     readWB(file,(err,wb)=>{
-      if(err) return;
+      if(err){ alert('Error al leer el archivo de seriales.'); return; }
       const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''});
       const serials=rows.map(r=>String(r[0]||'').trim()).filter(s=>s&&!/^(serial|serie|numero|number)/i.test(s));
       document.getElementById('input-serials').value=serials.join('\n');
@@ -1010,6 +1051,7 @@ function makeRow(d){ const r={}; INV_HEADERS.forEach(h=>r[h]=d[h]??''); return r
 
 function buildInventarioRows(config) {
   const rows=[];
+  const seenInstances=new Set();
   const {smartnet,subscriptions}=S.results;
   for(const item of smartnet){
     if(item.status!=='ok'&&item.status!=='wrong-client') continue;
@@ -1017,11 +1059,13 @@ function buildInventarioRows(config) {
     const loc=S.locationMap.get(serial)||'';
     const addr=item.source==='manual'?(row['_addr']||''):buildAddress(row);
     rows.push(makeRow({NAME:serial,Type:'CHASSIS',Model:cleanText(row['Product /Offer Name']),Serial:serial,Status:row['Status']||'ACTIVE','Descripción':cleanText(row['Description']),'Nombre cliente':config.clientOficial||row['End Customer Name']||'','Numero de PRY':config.pry,'No de Contrato Smartnet':row['Subscription ID/Contract Number']||'','Inicio SMARNET':fmtCiscoDate(row['Start Date']),'Fin de SMARNET':fmtCiscoDate(row['End Date']),'Nivel de Servicio':row['Service Level/Offer Type']||'','INICIO DE CEN SUPPORT':fmtConfigDate(config.inicioCen),'FIN DE CEN SUPPORT':fmtConfigDate(config.finCen),'TIPO CEN SUPPORT':config.tipoCen,ASSOCIATEDTO:1,ELEMENT:'GENERAL_CLIENTE',LOCATION:loc,'DIRECCION ENTREGA SMARNET':addr,SC:config.sc,Cantidad:row['Quantity']||1}));
-    let n=1;
     for(const minor of (item.minors||[])){
-      const mSerial=(minor['Instance Number']||'').trim()||`${serial}_DA${n}`;
+      if((minor['Item Type']||'').trim().toUpperCase()!=='SOFTWARE') continue;
+      const mSerial=(minor['Instance Number']||'').trim();
+      if(!mSerial) continue;
+      if(seenInstances.has(serial+'|'+mSerial)) continue;
+      seenInstances.add(serial+'|'+mSerial);
       rows.push(makeRow({NAME:mSerial,Type:'SOFTWARE',Model:cleanText(minor['Product /Offer Name']),Serial:mSerial,Status:minor['Status']||'ACTIVE','Descripción':cleanText(minor['Description']),'Nombre cliente':config.clientOficial||minor['End Customer Name']||'','Numero de PRY':config.pry,'No de Contrato Smartnet':minor['Subscription ID/Contract Number']||'','Inicio SMARNET':fmtCiscoDate(minor['Start Date']),'Fin de SMARNET':fmtCiscoDate(minor['End Date']),'Nivel de Servicio':minor['Service Level/Offer Type']||'','INICIO DE CEN SUPPORT':fmtConfigDate(config.inicioCen),'FIN DE CEN SUPPORT':fmtConfigDate(config.finCen),'TIPO CEN SUPPORT':config.tipoCen,ASSOCIATEDTO:2,ELEMENT:serial,LOCATION:loc,'DIRECCION ENTREGA SMARNET':buildAddress(minor),SC:config.sc,Cantidad:minor['Quantity']||1}));
-      n++;
     }
   }
   for(const item of subscriptions){
@@ -1096,11 +1140,6 @@ async function exportCarta() {
 
   const nombreContacto = document.getElementById('input-nombre-contacto').value.trim();
   const puesto         = document.getElementById('input-puesto').value.trim();
-  if (!nombreContacto || !puesto) {
-    alert('Para generar la carta completa el Nombre del contacto y Puesto en la pestaña ③ Configurar Proyecto.');
-    goToTab('config');
-    return;
-  }
 
   const config = S.results.config;
   const hoy    = new Date();
